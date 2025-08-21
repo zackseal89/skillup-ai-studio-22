@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,25 +7,40 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { 
   Brain, User, TrendingUp, BookOpen, Award, Clock, 
-  Target, ArrowRight, Lightbulb, Star
+  Target, ArrowRight, Lightbulb, Star, LogOut
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
+import { useUserSkills } from "@/hooks/useSkills";
+import { useToast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
-  const [user] = useState({
-    name: "Alex Johnson",
-    role: "Software Developer",
-    industry: "Technology",
-    overallProgress: 68
-  });
+  const { user, signOut } = useAuth();
+  const { data: profile } = useProfile();
+  const { data: userSkills } = useUserSkills();
+  const { toast } = useToast();
 
-  const skillGaps = [
-    { skill: "Machine Learning", current: 30, required: 85, priority: "High" },
-    { skill: "Cloud Architecture", current: 45, required: 80, priority: "High" },
-    { skill: "React/Next.js", current: 70, required: 90, priority: "Medium" },
-    { skill: "Data Analysis", current: 25, required: 70, priority: "Medium" },
-    { skill: "Leadership", current: 40, required: 75, priority: "Low" }
-  ];
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Signed out successfully",
+        description: "See you next time!"
+      });
+    } catch (error) {
+      toast({
+        title: "Error signing out",
+        description: "Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
 
+  // Calculate overall progress
+  const overallProgress = userSkills?.length ? 
+    Math.round(userSkills.reduce((acc, skill) => acc + skill.current_level, 0) / userSkills.length) : 0;
+
+  // Mock data for recommendations (will be replaced with AI-generated recommendations later)
   const recommendations = [
     {
       title: "Complete Machine Learning Fundamentals",
@@ -36,7 +52,7 @@ const Dashboard = () => {
     {
       title: "AWS Solutions Architect Certification",
       description: "Get cloud-ready with hands-on AWS training",
-      duration: "4 weeks",
+      duration: "4 weeks", 
       impact: "High",
       type: "Certification"
     },
@@ -96,8 +112,8 @@ const Dashboard = () => {
               <Lightbulb className="h-4 w-4" />
               AI Assistant
             </Button>
-            <Button variant="ghost" size="icon">
-              <User className="h-5 w-5" />
+            <Button variant="ghost" size="icon" onClick={handleSignOut}>
+              <LogOut className="h-5 w-5" />
             </Button>
           </div>
         </div>
@@ -108,7 +124,7 @@ const Dashboard = () => {
         {/* Welcome Section */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-foreground mb-2">
-            Welcome back, {user.name}! 👋
+            Welcome back, {profile?.full_name || 'there'}! 👋
           </h2>
           <p className="text-muted-foreground">
             Here's your personalized learning insights and recommendations.
@@ -128,7 +144,7 @@ const Dashboard = () => {
                       <span>Skill Gap Analysis</span>
                     </CardTitle>
                     <CardDescription>
-                      AI-generated insights based on your {user.role} role in {user.industry}
+                      AI-generated insights based on your {profile?.role} role in {profile?.industry}
                     </CardDescription>
                   </div>
                   <Button variant="outline" size="sm">
@@ -138,31 +154,39 @@ const Dashboard = () => {
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
-                {skillGaps.map((skill, index) => (
+                {userSkills?.map((userSkill, index) => (
                   <div key={index} className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-foreground">{skill.skill}</span>
+                      <span className="font-medium text-foreground">{userSkill.skills?.name}</span>
                       <div className="flex items-center space-x-2">
-                        <Badge variant={getPriorityColor(skill.priority) as any}>
-                          {skill.priority} Priority
+                        <Badge variant={getPriorityColor(userSkill.status === 'pending' ? 'High' : 'Medium') as any}>
+                          {userSkill.status === 'pending' ? 'High' : 'Medium'} Priority
                         </Badge>
                         <span className="text-sm text-muted-foreground">
-                          {skill.current}% / {skill.required}%
+                          {userSkill.current_level}% / {userSkill.target_level}%
                         </span>
                       </div>
                     </div>
                     <div className="relative">
-                      <Progress value={skill.current} className="h-2" />
+                      <Progress value={userSkill.current_level} className="h-2" />
                       <div 
                         className="absolute top-0 h-2 border-r-2 border-primary"
-                        style={{ left: `${skill.required}%` }}
+                        style={{ left: `${userSkill.target_level}%` }}
                       />
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      Gap: {skill.required - skill.current} points to reach industry standard
+                      Gap: {userSkill.target_level - userSkill.current_level} points to reach target level
                     </div>
                   </div>
-                ))}
+                )) || (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Target className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p className="mb-2">No skills assessed yet</p>
+                    <Button variant="outline" size="sm" asChild>
+                      <Link to="/assessment">Take Skills Assessment</Link>
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -220,19 +244,19 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-primary mb-2">{user.overallProgress}%</div>
-                  <Progress value={user.overallProgress} className="progress-glow" />
+                  <div className="text-3xl font-bold text-primary mb-2">{overallProgress}%</div>
+                  <Progress value={overallProgress} className="progress-glow" />
                   <p className="text-sm text-muted-foreground mt-2">
-                    Great progress! You're ahead of 78% of learners.
+                    {overallProgress > 50 ? "Great progress! Keep it up!" : "Get started with your first assessment!"}
                   </p>
                 </div>
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
                   <div className="text-center">
-                    <div className="text-lg font-semibold text-foreground">12</div>
-                    <div className="text-xs text-muted-foreground">Courses Completed</div>
+                    <div className="text-lg font-semibold text-foreground">{userSkills?.length || 0}</div>
+                    <div className="text-xs text-muted-foreground">Skills Tracked</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-lg font-semibold text-foreground">3</div>
+                    <div className="text-lg font-semibold text-foreground">0</div>
                     <div className="text-xs text-muted-foreground">Certificates Earned</div>
                   </div>
                 </div>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,9 +7,16 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Brain, ArrowLeft, CheckCircle } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 const SignUp = () => {
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const { signUp } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -55,12 +62,40 @@ const SignUp = () => {
     setStep(step + 1);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the data to your backend
-    console.log("Form submitted:", formData);
-    // Redirect to dashboard or profile setup
-    window.location.href = "/dashboard";
+    setLoading(true);
+
+    try {
+      const { error } = await signUp(formData.email, formData.password, {
+        full_name: formData.fullName,
+        industry: formData.industry,
+        role: formData.role,
+        experience_level: formData.experience
+      });
+
+      if (error) {
+        toast({
+          title: "Sign Up Failed",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Welcome to SkillUp AI!",
+          description: "Please check your email to verify your account."
+        });
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      toast({
+        title: "Sign Up Failed", 
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -241,9 +276,9 @@ const SignUp = () => {
                     type="submit" 
                     variant="success" 
                     className="w-full"
-                    disabled={formData.goals.length === 0}
+                    disabled={formData.goals.length === 0 || loading}
                   >
-                    Complete Registration
+                    {loading ? "Creating Account..." : "Complete Registration"}
                   </Button>
                 </>
               )}
@@ -254,6 +289,7 @@ const SignUp = () => {
                 variant="ghost" 
                 className="w-full mt-4" 
                 onClick={() => setStep(step - 1)}
+                disabled={loading}
               >
                 Go Back
               </Button>

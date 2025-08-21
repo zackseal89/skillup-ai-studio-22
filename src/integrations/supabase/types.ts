@@ -14,7 +14,181 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      certifications: {
+        Row: {
+          certificate_name: string
+          certificate_url: string | null
+          id: string
+          issued_at: string
+          skill_id: string
+          user_id: string
+        }
+        Insert: {
+          certificate_name: string
+          certificate_url?: string | null
+          id?: string
+          issued_at?: string
+          skill_id: string
+          user_id: string
+        }
+        Update: {
+          certificate_name?: string
+          certificate_url?: string | null
+          id?: string
+          issued_at?: string
+          skill_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certifications_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          experience_level: string
+          full_name: string
+          id: string
+          industry: string
+          role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          experience_level: string
+          full_name: string
+          id?: string
+          industry: string
+          role: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          experience_level?: string
+          full_name?: string
+          id?: string
+          industry?: string
+          role?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      progress: {
+        Row: {
+          completed_at: string | null
+          completion_percentage: number
+          created_at: string
+          id: string
+          module_id: string
+          module_type: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completion_percentage?: number
+          created_at?: string
+          id?: string
+          module_id: string
+          module_type: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          completion_percentage?: number
+          created_at?: string
+          id?: string
+          module_id?: string
+          module_type?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      skills: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          difficulty_level: number
+          id: string
+          industry: string
+          name: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          difficulty_level?: number
+          id?: string
+          industry: string
+          name: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          difficulty_level?: number
+          id?: string
+          industry?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      user_skills: {
+        Row: {
+          assessed_at: string | null
+          current_level: number
+          id: string
+          skill_id: string
+          status: string
+          target_level: number
+          user_id: string
+        }
+        Insert: {
+          assessed_at?: string | null
+          current_level?: number
+          id?: string
+          skill_id: string
+          status?: string
+          target_level?: number
+          user_id: string
+        }
+        Update: {
+          assessed_at?: string | null
+          current_level?: number
+          id?: string
+          skill_id?: string
+          status?: string
+          target_level?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_skills_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
