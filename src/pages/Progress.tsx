@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -210,7 +209,7 @@ const ProgressPage = () => {
                     <div className="flex items-center justify-between">
                       <span className="font-medium">{userSkill.skills?.name}</span>
                       <div className="flex items-center space-x-2">
-                        <Badge variant={userSkill.current_level >= userSkill.target_level ? "success" : "secondary"}>
+                        <Badge variant={userSkill.current_level >= userSkill.target_level ? "default" : "secondary"}>
                           {userSkill.current_level}% / {userSkill.target_level}%
                         </Badge>
                       </div>
@@ -311,7 +310,7 @@ const ProgressPage = () => {
                             {achievement.description}
                           </p>
                           {achievement.earned ? (
-                            <Badge variant="success" className="text-xs">
+                            <Badge variant="default" className="text-xs bg-green-600 text-white">
                               Earned {achievement.earnedDate}
                             </Badge>
                           ) : (
