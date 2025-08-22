@@ -1,7 +1,7 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useCompany } from './useCompanies';
 
 export interface Team {
   id: string;
@@ -37,21 +37,23 @@ export interface TeamInvitation {
 
 export const useTeams = () => {
   const { user } = useAuth();
+  const { data: company } = useCompany();
 
   return useQuery({
-    queryKey: ['teams', user?.id],
+    queryKey: ['teams', user?.id, company?.id],
     queryFn: async () => {
-      if (!user) return [];
+      if (!user || !company) return [];
       
       const { data, error } = await supabase
         .from('teams')
         .select('*')
-        .eq('manager_id', user.id);
+        .eq('manager_id', user.id)
+        .eq('company_id', company.id);
 
       if (error) throw error;
       return data as Team[];
     },
-    enabled: !!user,
+    enabled: !!user && !!company,
   });
 };
 
@@ -75,14 +77,18 @@ export const useTeamMembers = (teamId: string) => {
 export const useCreateTeam = () => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { data: company } = useCompany();
 
   return useMutation({
     mutationFn: async (teamData: { name: string; description?: string }) => {
+      if (!company) throw new Error('No company found');
+
       const { data, error } = await supabase
         .from('teams')
         .insert({
           ...teamData,
           manager_id: user?.id,
+          company_id: company.id,
         })
         .select()
         .single();
@@ -174,4 +180,3 @@ export const useTeamProgress = (teamId: string) => {
     enabled: !!teamId,
   });
 };
-

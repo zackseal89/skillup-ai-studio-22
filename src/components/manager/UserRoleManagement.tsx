@@ -6,12 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { UserCog, Search, Shield, Users } from "lucide-react";
+import { UserCog, Search, Shield, Users, Building2 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useCompany } from "@/hooks/useCompanies";
 
 interface Profile {
   user_id: string;
@@ -20,26 +20,31 @@ interface Profile {
   is_manager: boolean;
   industry: string;
   role: string;
+  company_id: string;
 }
 
 export const UserRoleManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [showPromoteDialog, setShowPromoteDialog] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { data: company } = useCompany();
 
-  // Fetch all users
+  // Fetch users from the same company
   const { data: users, isLoading } = useQuery({
-    queryKey: ['all-users'],
+    queryKey: ['company-users', company?.id],
     queryFn: async () => {
+      if (!company) return [];
+
       const { data, error } = await supabase
         .from('profiles')
-        .select('user_id, full_name, email, is_manager, industry, role')
+        .select('user_id, full_name, email, is_manager, industry, role, company_id')
+        .eq('company_id', company.id)
         .order('full_name');
 
       if (error) throw error;
       return data as Profile[];
     },
+    enabled: !!company,
   });
 
   // Update user manager status
@@ -53,7 +58,7 @@ export const UserRoleManagement = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['all-users'] });
+      queryClient.invalidateQueries({ queryKey: ['company-users'] });
       toast({
         title: "Success",
         description: "User role updated successfully",
@@ -84,15 +89,29 @@ export const UserRoleManagement = () => {
   const managerCount = users?.filter(user => user.is_manager).length || 0;
   const totalUsers = users?.length || 0;
 
+  if (!company) {
+    return (
+      <Card>
+        <CardContent className="p-8 text-center">
+          <Building2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+          <h3 className="font-semibold mb-2">No Company Setup</h3>
+          <p className="text-muted-foreground">
+            You need to create or join a company first to manage user roles.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center">
           <UserCog className="h-5 w-5 mr-2" />
-          User Role Management
+          User Role Management - {company.name}
         </CardTitle>
         <CardDescription>
-          Manage user permissions and promote users to managers
+          Manage user permissions for employees in your company
         </CardDescription>
       </CardHeader>
 
@@ -149,7 +168,7 @@ export const UserRoleManagement = () => {
               ) : filteredUsers.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                    No users found
+                    {totalUsers === 0 ? "No employees have joined your company yet" : "No users found"}
                   </TableCell>
                 </TableRow>
               ) : (
