@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +11,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTeamMembers, useTeamProgress } from "@/hooks/useTeams";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { TrendingUp, Users, Award, Clock } from "lucide-react";
 
 interface TeamOverviewProps {
@@ -22,7 +23,25 @@ export const TeamOverview = ({ teamId }: TeamOverviewProps) => {
   const { data: members } = useTeamMembers(teamId);
   const { data: teamProgress } = useTeamProgress(teamId);
 
-  if (!members || !teamProgress) {
+  // Fetch profiles for team members
+  const { data: profiles } = useQuery({
+    queryKey: ['team-profiles', teamId],
+    queryFn: async () => {
+      if (!members || members.length === 0) return [];
+      
+      const userIds = members.map(m => m.user_id);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .in('user_id', userIds);
+
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!members && members.length > 0,
+  });
+
+  if (!members || !teamProgress || !profiles) {
     return (
       <Card>
         <CardContent className="p-8 text-center">
@@ -39,11 +58,17 @@ export const TeamOverview = ({ teamId }: TeamOverviewProps) => {
     ? Math.round(teamProgress.progress.reduce((sum, p) => sum + p.completion_percentage, 0) / teamProgress.progress.length)
     : 0;
 
+  // Create profiles lookup
+  const profilesMap = profiles.reduce((acc, profile) => {
+    acc[profile.user_id] = profile;
+    return acc;
+  }, {} as Record<string, any>);
+
   // Group progress by user
   const userProgressMap = teamProgress.progress.reduce((acc, progress) => {
     if (!acc[progress.user_id]) {
       acc[progress.user_id] = {
-        user: progress.profiles,
+        user: profilesMap[progress.user_id],
         modules: [],
         totalProgress: 0,
         completedCount: 0,
