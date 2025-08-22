@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +25,35 @@ import { useSkills, useUserSkills } from "@/hooks/useSkills";
 import { useUserProgress } from "@/hooks/useProgress";
 import { useCertificates } from "@/hooks/useCertificates";
 import { AppLayout } from "@/components/AppLayout";
+
+// Type definitions for achievements
+type EarnedAchievement = {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ComponentType<any>;
+  earned: true;
+  earnedDate: string;
+};
+
+type ProgressAchievement = {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ComponentType<any>;
+  earned: false;
+  progress: { current: number; total: number; unit: string };
+};
+
+type SimpleAchievement = {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ComponentType<any>;
+  earned: false;
+};
+
+type Achievement = EarnedAchievement | ProgressAchievement | SimpleAchievement;
 
 const ProgressPage = () => {
   const { data: skills } = useSkills();
@@ -95,7 +125,8 @@ const ProgressPage = () => {
       progress: Math.round((completedCourses / Math.max(userProgress?.length || 1, 1)) * 100),
       targetDate: "2024-03-15",
       priority: "high",
-      status: "active"
+      status: "active",
+      completedDate: "2024-02-15" // Added missing property
     }
   ];
 
@@ -109,14 +140,14 @@ const ProgressPage = () => {
     points: progress.status === 'completed' ? 50 : progress.completion_percentage
   })) || [];
 
-  // Transform certificates to achievements
-  const achievementsList = [
+  // Transform certificates to achievements with proper typing
+  const achievementsList: Achievement[] = [
     ...certificates?.map(cert => ({
       id: cert.id,
       title: cert.certificate_name,
       description: "Certificate earned for completing course",
       icon: Award,
-      earned: true,
+      earned: true as const,
       earnedDate: new Date(cert.issued_at).toLocaleDateString()
     })) || [],
     {
@@ -124,7 +155,7 @@ const ProgressPage = () => {
       title: "Assessment Ace",
       description: "Pass 5 assessments with a score above 80%",
       icon: CheckCircle,
-      earned: false,
+      earned: false as const,
       progress: { current: userSkills?.filter(s => s.current_level >= 80).length || 0, total: 5, unit: "assessments" }
     },
     {
@@ -132,7 +163,7 @@ const ProgressPage = () => {
       title: "Learning Streak",
       description: "Study for 7 consecutive days",
       icon: Calendar,
-      earned: false,
+      earned: false as const,
       progress: { current: 3, total: 7, unit: "days" }
     },
     {
@@ -140,7 +171,7 @@ const ProgressPage = () => {
       title: "Star Student",
       description: "Achieve a perfect score on an assessment",
       icon: Star,
-      earned: false
+      earned: false as const
     }
   ];
 
@@ -410,7 +441,7 @@ const ProgressPage = () => {
                     ) : (
                       <div className="space-y-1">
                         <Badge variant="secondary">Not Earned</Badge>
-                        {achievement.progress && (
+                        {'progress' in achievement && (
                           <div className="space-y-1">
                             <ProgressBar value={achievement.progress.current / achievement.progress.total * 100} className="h-1" />
                             <p className="text-xs text-muted-foreground">
