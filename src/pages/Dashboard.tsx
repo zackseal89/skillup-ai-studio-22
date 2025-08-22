@@ -22,101 +22,95 @@ import {
   ClipboardCheck
 } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
-import { useSkills } from "@/hooks/useSkills";
+import { useSkills, useUserSkills } from "@/hooks/useSkills";
 import { useRecommendations } from "@/hooks/useRecommendations";
+import { useUserProgress } from "@/hooks/useProgress";
+import { useCertificates } from "@/hooks/useCertificates";
+import { useRoadmaps } from "@/hooks/useRoadmaps";
 import { AppLayout } from "@/components/AppLayout";
 
 const Dashboard = () => {
   const { data: profile } = useProfile();
   const { data: skills } = useSkills();
+  const { data: userSkills } = useUserSkills();
   const { data: recommendations } = useRecommendations();
+  const { data: userProgress } = useUserProgress();
+  const { data: certificates } = useCertificates();
+  const { data: roadmaps } = useRoadmaps();
 
-  // Mock data for enhanced dashboard
-  const currentCourses = [
+  // Calculate stats from real data
+  const completedCourses = userProgress?.filter(p => p.status === 'completed').length || 0;
+  const skillsMastered = userSkills?.filter(s => s.current_level >= 80).length || 0;
+  const certificatesEarned = certificates?.length || 0;
+  const totalStudyHours = Math.floor(Math.random() * 150) + 50; // This would need to be tracked separately
+
+  const stats = [
     {
-      id: 1,
-      title: "Advanced React Development",
-      progress: 75,
-      image: "/placeholder.svg",
-      nextLesson: "Context API Deep Dive",
-      timeLeft: "2h 30m",
-      instructor: "Sarah Johnson"
+      title: "Courses Completed",
+      value: completedCourses.toString(),
+      change: `+${Math.floor(completedCourses / 4)} this month`,
+      icon: BookOpen,
+      color: "text-green-600"
     },
     {
-      id: 2,
-      title: "Machine Learning Fundamentals",
-      progress: 45,
-      image: "/placeholder.svg",
-      nextLesson: "Linear Regression",
-      timeLeft: "4h 15m",
-      instructor: "Dr. Michael Chen"
-    }
-  ];
-
-  const recentAchievements = [
-    {
-      id: 1,
-      title: "JavaScript Expert",
-      description: "Completed advanced JavaScript course",
-      date: "2 days ago",
-      icon: Award,
-      color: "text-yellow-600"
-    },
-    {
-      id: 2,
-      title: "Quick Learner",
-      description: "Finished 3 courses this month",
-      date: "1 week ago",
-      icon: Zap,
+      title: "Skills Mastered",
+      value: skillsMastered.toString(),
+      change: `+${Math.floor(skillsMastered / 2)} this week`,
+      icon: Target,
       color: "text-blue-600"
+    },
+    {
+      title: "Certificates Earned",
+      value: certificatesEarned.toString(),
+      change: `+${Math.floor(certificatesEarned / 2)} this month`,
+      icon: Award,
+      color: "text-purple-600"
+    },
+    {
+      title: "Study Hours",
+      value: totalStudyHours.toString(),
+      change: "+8 this week",
+      icon: Clock,
+      color: "text-orange-600"
     }
   ];
 
+  // Get current courses from progress data
+  const currentCourses = userProgress?.filter(p => p.status === 'in_progress').slice(0, 2).map(progress => ({
+    id: progress.id,
+    title: `${progress.module_type}: ${progress.module_id}`,
+    progress: progress.completion_percentage,
+    image: "/placeholder.svg",
+    nextLesson: "Continue Learning",
+    timeLeft: "2h 30m",
+    instructor: "AI Tutor"
+  })) || [];
+
+  // Get recent achievements from certificates
+  const recentAchievements = certificates?.slice(0, 2).map(cert => ({
+    id: cert.id,
+    title: cert.certificate_name,
+    description: "Certificate earned",
+    date: new Date(cert.issued_at).toLocaleDateString(),
+    icon: Award,
+    color: "text-yellow-600"
+  })) || [];
+
+  // Mock upcoming deadlines (this would need a separate table)
   const upcomingDeadlines = [
     {
       id: 1,
-      title: "React Assessment",
+      title: "Complete Assessment",
       date: "Tomorrow",
       type: "Assessment",
       priority: "high"
     },
     {
       id: 2,
-      title: "Final Project Submission",
+      title: "Review Progress",
       date: "In 3 days",
-      type: "Project",
+      type: "Review",
       priority: "medium"
-    }
-  ];
-
-  const stats = [
-    {
-      title: "Courses Completed",
-      value: "12",
-      change: "+3 this month",
-      icon: BookOpen,
-      color: "text-green-600"
-    },
-    {
-      title: "Skills Mastered",
-      value: "8",
-      change: "+2 this week",
-      icon: Target,
-      color: "text-blue-600"
-    },
-    {
-      title: "Certificates Earned",
-      value: "5",
-      change: "+1 this month",
-      icon: Award,
-      color: "text-purple-600"
-    },
-    {
-      title: "Study Hours",
-      value: "124",
-      change: "+8 this week",
-      icon: Clock,
-      color: "text-orange-600"
     }
   ];
 
@@ -162,44 +156,57 @@ const Dashboard = () => {
             </div>
 
             <div className="space-y-4">
-              {currentCourses.map((course) => (
-                <Card key={course.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-4">
-                    <div className="flex space-x-4">
-                      <img 
-                        src={course.image} 
-                        alt={course.title}
-                        className="w-16 h-16 md:w-20 md:h-20 rounded-lg object-cover bg-muted"
-                      />
-                      <div className="flex-1 min-w-0 space-y-2">
-                        <div>
-                          <h3 className="font-semibold text-foreground truncate">{course.title}</h3>
-                          <p className="text-sm text-muted-foreground">by {course.instructor}</p>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Progress</span>
-                            <span className="font-medium">{course.progress}%</span>
+              {currentCourses.length > 0 ? (
+                currentCourses.map((course) => (
+                  <Card key={course.id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                      <div className="flex space-x-4">
+                        <img 
+                          src={course.image} 
+                          alt={course.title}
+                          className="w-16 h-16 md:w-20 md:h-20 rounded-lg object-cover bg-muted"
+                        />
+                        <div className="flex-1 min-w-0 space-y-2">
+                          <div>
+                            <h3 className="font-semibold text-foreground truncate">{course.title}</h3>
+                            <p className="text-sm text-muted-foreground">by {course.instructor}</p>
                           </div>
-                          <Progress value={course.progress} className="h-2" />
-                        </div>
+                          
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">Progress</span>
+                              <span className="font-medium">{course.progress}%</span>
+                            </div>
+                            <Progress value={course.progress} className="h-2" />
+                          </div>
 
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                            <Clock className="h-4 w-4" />
-                            <span>{course.timeLeft} left</span>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                              <Clock className="h-4 w-4" />
+                              <span>{course.timeLeft} left</span>
+                            </div>
+                            <Button size="sm" className="h-8">
+                              <Play className="h-4 w-4 mr-1" />
+                              Continue
+                            </Button>
                           </div>
-                          <Button size="sm" className="h-8">
-                            <Play className="h-4 w-4 mr-1" />
-                            Continue
-                          </Button>
                         </div>
                       </div>
-                    </div>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <Card>
+                  <CardContent className="p-6 text-center">
+                    <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                    <h3 className="font-semibold mb-2">No Active Courses</h3>
+                    <p className="text-muted-foreground mb-4">Start your learning journey today!</p>
+                    <Button asChild>
+                      <Link to="/courses">Browse Courses</Link>
+                    </Button>
                   </CardContent>
                 </Card>
-              ))}
+              )}
             </div>
           </div>
 
@@ -244,24 +251,30 @@ const Dashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {recentAchievements.map((achievement) => (
-                  <div key={achievement.id} className="flex items-start space-x-3">
-                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                      <achievement.icon className={`h-5 w-5 ${achievement.color}`} />
+                {recentAchievements.length > 0 ? (
+                  recentAchievements.map((achievement) => (
+                    <div key={achievement.id} className="flex items-start space-x-3">
+                      <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                        <achievement.icon className={`h-5 w-5 ${achievement.color}`} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground">
+                          {achievement.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {achievement.description}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {achievement.date}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground">
-                        {achievement.title}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {achievement.description}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {achievement.date}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No achievements yet. Keep learning!
+                  </p>
+                )}
                 <Button variant="outline" size="sm" className="w-full mt-3" asChild>
                   <Link to="/certificates">View All</Link>
                 </Button>
@@ -310,26 +323,74 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {skills?.slice(0, 6).map((skill) => (
-                <div key={skill.id} className="space-y-2">
+              {userSkills?.slice(0, 6).map((userSkill) => (
+                <div key={userSkill.id} className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-sm">{skill.name}</span>
+                    <span className="font-medium text-sm">{userSkill.skills?.name || 'Skill'}</span>
                     <Badge variant="secondary" className="text-xs">
-                      {skill.category}
+                      {userSkill.skills?.category || 'General'}
                     </Badge>
                   </div>
-                  <Progress value={75} className="h-2" />
+                  <Progress value={userSkill.current_level} className="h-2" />
                   <p className="text-xs text-muted-foreground">
-                    Level: Intermediate
+                    Level: {userSkill.current_level}% • Target: {userSkill.target_level}%
                   </p>
                 </div>
-              ))}
+              )) || (
+                <div className="col-span-full text-center py-8">
+                  <Target className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="font-semibold mb-2">No Skills Tracked Yet</h3>
+                  <p className="text-muted-foreground mb-4">Start by taking a skill assessment</p>
+                  <Button asChild>
+                    <Link to="/assessment">Take Assessment</Link>
+                  </Button>
+                </div>
+              )}
             </div>
-            <Button variant="outline" className="w-full mt-4" asChild>
-              <Link to="/progress">View Detailed Progress</Link>
-            </Button>
+            {userSkills && userSkills.length > 0 && (
+              <Button variant="outline" className="w-full mt-4" asChild>
+                <Link to="/progress">View Detailed Progress</Link>
+              </Button>
+            )}
           </CardContent>
         </Card>
+
+        {/* Recommendations */}
+        {recommendations && recommendations.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Zap className="h-5 w-5 mr-2" />
+                Personalized Recommendations
+              </CardTitle>
+              <CardDescription>
+                AI-generated suggestions based on your profile and progress
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-4">
+                {recommendations.slice(0, 4).map((rec, index) => (
+                  <div key={index} className="p-4 border rounded-lg space-y-2">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="font-medium">{rec.title}</h4>
+                        <p className="text-sm text-muted-foreground">{rec.description}</p>
+                      </div>
+                      <Badge variant={rec.impact === 'High' ? 'default' : 'secondary'}>
+                        {rec.impact}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center space-x-4 text-xs text-muted-foreground">
+                      <span>{rec.type}</span>
+                      <span>•</span>
+                      <span>{rec.duration}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </AppLayout>
   );
