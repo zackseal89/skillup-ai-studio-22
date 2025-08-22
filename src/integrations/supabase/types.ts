@@ -120,6 +120,7 @@ export type Database = {
           full_name: string
           id: string
           industry: string
+          is_manager: boolean | null
           role: string
           updated_at: string
           user_id: string
@@ -131,6 +132,7 @@ export type Database = {
           full_name: string
           id?: string
           industry: string
+          is_manager?: boolean | null
           role: string
           updated_at?: string
           user_id: string
@@ -142,6 +144,7 @@ export type Database = {
           full_name?: string
           id?: string
           industry?: string
+          is_manager?: boolean | null
           role?: string
           updated_at?: string
           user_id?: string
@@ -214,6 +217,103 @@ export type Database = {
         }
         Relationships: []
       }
+      team_invitations: {
+        Row: {
+          accepted_at: string | null
+          email: string
+          id: string
+          invited_at: string
+          invited_by: string
+          status: string
+          team_id: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          email: string
+          id?: string
+          invited_at?: string
+          invited_by: string
+          status?: string
+          team_id: string
+        }
+        Update: {
+          accepted_at?: string | null
+          email?: string
+          id?: string
+          invited_at?: string
+          invited_by?: string
+          status?: string
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_invitations_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_members: {
+        Row: {
+          id: string
+          joined_at: string
+          role: string
+          team_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          role?: string
+          team_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          role?: string
+          team_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          manager_id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          manager_id: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          manager_id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_skills: {
         Row: {
           assessed_at: string | null
@@ -257,7 +357,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      accept_team_invitation: {
+        Args: { invitation_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
