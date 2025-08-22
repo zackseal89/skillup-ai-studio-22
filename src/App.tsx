@@ -11,6 +11,10 @@ import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
 import CourseView from "./pages/CourseView";
+import Courses from "./pages/Courses";
+import Progress from "./pages/Progress";
+import Certificates from "./pages/Certificates";
+import Assessment from "./pages/Assessment";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,7 +42,22 @@ const App = () => (
             } />
             <Route path="/courses" element={
               <ProtectedRoute>
-                <CourseView />
+                <Courses />
+              </ProtectedRoute>
+            } />
+            <Route path="/progress" element={
+              <ProtectedRoute>
+                <Progress />
+              </ProtectedRoute>
+            } />
+            <Route path="/certificates" element={
+              <ProtectedRoute>
+                <Certificates />
+              </ProtectedRoute>
+            } />
+            <Route path="/assessment/:skillId?" element={
+              <ProtectedRoute>
+                <Assessment />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

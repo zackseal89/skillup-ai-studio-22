@@ -3,322 +3,427 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
-  BookOpen, Clock, Users, Star, Search, Filter,
-  Brain, ArrowLeft, PlayCircle, Award, TrendingUp
+  Search, 
+  Filter, 
+  Star, 
+  Clock, 
+  Users, 
+  BookOpen, 
+  Play,
+  Award,
+  TrendingUp,
+  Briefcase,
+  Code,
+  Brain,
+  Target
 } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
-import { useProfile } from "@/hooks/useProfile";
-
-interface Course {
-  id: string;
-  title: string;
-  description: string;
-  instructor: string;
-  duration: string;
-  level: 'Beginner' | 'Intermediate' | 'Advanced';
-  rating: number;
-  students: number;
-  category: string;
-  skills: string[];
-  price: number;
-  thumbnail: string;
-}
+import { AppLayout } from "@/components/AppLayout";
 
 const Courses = () => {
-  const { user } = useAuth();
-  const { data: profile } = useProfile();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterLevel, setFilterLevel] = useState("");
-  const [filterCategory, setFilterCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedLevel, setSelectedLevel] = useState("all");
 
-  // Mock courses data - in production, this would come from a database
-  const courses: Course[] = [
+  const categories = [
+    { id: "all", name: "All Categories", icon: BookOpen },
+    { id: "technology", name: "Technology", icon: Code },
+    { id: "business", name: "Business", icon: Briefcase },
+    { id: "leadership", name: "Leadership", icon: Target },
+    { id: "ai", name: "AI & Machine Learning", icon: Brain }
+  ];
+
+  const courses = [
     {
-      id: '1',
-      title: 'Machine Learning Fundamentals',
-      description: 'Learn the basics of machine learning with practical examples and hands-on projects.',
-      instructor: 'Dr. Sarah Chen',
-      duration: '8 weeks',
-      level: 'Beginner',
+      id: 1,
+      title: "Advanced React Development",
+      description: "Master modern React patterns, hooks, and state management for building scalable applications.",
+      instructor: "Sarah Johnson",
+      instructorAvatar: "/placeholder.svg",
+      duration: "12 weeks",
+      students: 2847,
       rating: 4.8,
-      students: 2341,
-      category: 'Technology',
-      skills: ['Python', 'Data Analysis', 'Machine Learning'],
-      price: 199,
-      thumbnail: '/placeholder.svg'
+      reviews: 234,
+      level: "Advanced",
+      category: "technology",
+      image: "/placeholder.svg",
+      price: "Free",
+      skills: ["React", "JavaScript", "State Management"],
+      modules: 15,
+      certificate: true,
+      featured: true
     },
     {
-      id: '2',
-      title: 'Financial Risk Management',
-      description: 'Master modern risk assessment techniques and regulatory compliance in finance.',
-      instructor: 'Michael Rodriguez',
-      duration: '6 weeks',
-      level: 'Intermediate',
+      id: 2,
+      title: "Machine Learning Fundamentals",
+      description: "Learn the core concepts of machine learning and build your first predictive models.",
+      instructor: "Dr. Michael Chen",
+      instructorAvatar: "/placeholder.svg",
+      duration: "8 weeks",
+      students: 1923,
       rating: 4.9,
-      students: 1567,
-      category: 'Finance',
-      skills: ['Risk Analysis', 'Compliance', 'Financial Modeling'],
-      price: 249,
-      thumbnail: '/placeholder.svg'
+      reviews: 187,
+      level: "Beginner",
+      category: "ai",
+      image: "/placeholder.svg",
+      price: "Free",
+      skills: ["Python", "Machine Learning", "Data Analysis"],
+      modules: 12,
+      certificate: true,
+      featured: false
     },
     {
-      id: '3',
-      title: 'Healthcare Data Analytics',
-      description: 'Analyze patient data and outcomes to improve healthcare delivery and efficiency.',
-      instructor: 'Dr. Emily Watson',
-      duration: '10 weeks',
-      level: 'Advanced',
+      id: 3,
+      title: "Strategic Leadership in Digital Age",
+      description: "Develop leadership skills needed to guide teams through digital transformation.",
+      instructor: "Emily Rodriguez",
+      instructorAvatar: "/placeholder.svg",
+      duration: "6 weeks",
+      students: 1456,
       rating: 4.7,
-      students: 892,
-      category: 'Healthcare',
-      skills: ['Data Analytics', 'Healthcare Systems', 'Statistics'],
-      price: 299,
-      thumbnail: '/placeholder.svg'
+      reviews: 156,
+      level: "Intermediate",
+      category: "leadership",
+      image: "/placeholder.svg",
+      price: "Free",
+      skills: ["Leadership", "Strategy", "Digital Transformation"],
+      modules: 10,
+      certificate: true,
+      featured: true
     },
     {
-      id: '4',
-      title: 'Cloud Architecture Design',
-      description: 'Design scalable and secure cloud infrastructure using modern best practices.',
-      instructor: 'James Liu',
-      duration: '12 weeks',
-      level: 'Advanced',
-      rating: 4.9,
-      students: 1234,
-      category: 'Technology',
-      skills: ['AWS', 'Cloud Architecture', 'DevOps'],
-      price: 349,
-      thumbnail: '/placeholder.svg'
-    },
-    {
-      id: '5',
-      title: 'Digital Marketing Analytics',
-      description: 'Master data-driven marketing strategies and customer analytics.',
-      instructor: 'Lisa Thompson',
-      duration: '4 weeks',
-      level: 'Intermediate',
+      id: 4,
+      title: "Project Management Essentials",
+      description: "Master project management methodologies and tools for successful project delivery.",
+      instructor: "James Wilson",
+      instructorAvatar: "/placeholder.svg",
+      duration: "10 weeks",
+      students: 3124,
       rating: 4.6,
-      students: 1876,
-      category: 'Marketing',
-      skills: ['Analytics', 'Digital Marketing', 'Customer Insights'],
-      price: 149,
-      thumbnail: '/placeholder.svg'
+      reviews: 298,
+      level: "Beginner",
+      category: "business",
+      image: "/placeholder.svg",
+      price: "Free",
+      skills: ["Project Management", "Agile", "Scrum"],
+      modules: 14,
+      certificate: true,
+      featured: false
     },
     {
-      id: '6',
-      title: 'Cybersecurity Fundamentals',
-      description: 'Learn essential cybersecurity principles and threat mitigation strategies.',
-      instructor: 'Robert Kim',
-      duration: '8 weeks',
-      level: 'Beginner',
+      id: 5,
+      title: "Full-Stack Web Development",
+      description: "Build complete web applications from frontend to backend with modern technologies.",
+      instructor: "Alex Thompson",
+      instructorAvatar: "/placeholder.svg",
+      duration: "16 weeks",
+      students: 2657,
       rating: 4.8,
-      students: 2156,
-      category: 'Technology',
-      skills: ['Cybersecurity', 'Network Security', 'Threat Analysis'],
-      price: 199,
-      thumbnail: '/placeholder.svg'
+      reviews: 312,
+      level: "Intermediate",
+      category: "technology",
+      image: "/placeholder.svg",
+      price: "Free",
+      skills: ["HTML", "CSS", "JavaScript", "Node.js", "Database"],
+      modules: 20,
+      certificate: true,
+      featured: true
+    },
+    {
+      id: 6,
+      title: "Data Science with Python",
+      description: "Analyze data and create insights using Python libraries and statistical methods.",
+      instructor: "Dr. Lisa Chang",
+      instructorAvatar: "/placeholder.svg",
+      duration: "14 weeks",
+      students: 1834,
+      rating: 4.9,
+      reviews: 221,
+      level: "Intermediate",
+      category: "ai",
+      image: "/placeholder.svg",
+      price: "Free",
+      skills: ["Python", "Data Analysis", "Statistics", "Visualization"],
+      modules: 18,
+      certificate: true,
+      featured: false
     }
   ];
 
-  // Filter courses based on search and filters
   const filteredCourses = courses.filter(course => {
     const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          course.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          course.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesCategory = selectedCategory === "all" || course.category === selectedCategory;
+    const matchesLevel = selectedLevel === "all" || course.level.toLowerCase() === selectedLevel;
     
-    const matchesLevel = !filterLevel || course.level === filterLevel;
-    const matchesCategory = !filterCategory || course.category === filterCategory;
-    
-    return matchesSearch && matchesLevel && matchesCategory;
+    return matchesSearch && matchesCategory && matchesLevel;
   });
 
-  const getLevelColor = (level: string) => {
-    switch (level) {
-      case 'Beginner': return 'bg-green-100 text-green-800';
-      case 'Intermediate': return 'bg-yellow-100 text-yellow-800';
-      case 'Advanced': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
+  const featuredCourses = courses.filter(course => course.featured);
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card shadow-soft">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Link to="/" className="flex items-center space-x-2">
-              <Brain className="h-8 w-8 text-primary" />
-              <h1 className="text-2xl font-bold text-foreground">SkillUp AI</h1>
-            </Link>
-            <nav className="hidden md:flex items-center space-x-6 ml-8">
-              <Link to="/dashboard" className="text-muted-foreground hover:text-primary transition-smooth">Dashboard</Link>
-              <Link to="/courses" className="text-primary font-medium">Courses</Link>
-              <Link to="/progress" className="text-muted-foreground hover:text-primary transition-smooth">Progress</Link>
-              <Link to="/certificates" className="text-muted-foreground hover:text-primary transition-smooth">Certificates</Link>
-            </nav>
-          </div>
-          <Button asChild>
-            <Link to="/dashboard">
-              <ArrowLeft className="h-4 w-4" />
-              Dashboard
-            </Link>
-          </Button>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        {/* Page Header */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-foreground mb-2">Course Library</h2>
+    <AppLayout>
+      <div className="p-4 md:p-6 space-y-6">
+        {/* Header */}
+        <div className="space-y-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Course Catalog</h1>
           <p className="text-muted-foreground">
-            Discover courses tailored to your career goals and skill development needs
+            Discover courses designed to advance your career and close skill gaps
           </p>
         </div>
 
         {/* Search and Filters */}
-        <Card className="mb-8">
-          <CardContent className="pt-6">
-            <div className="grid md:grid-cols-4 gap-4">
-              <div className="md:col-span-2">
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search courses, skills, or topics..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
+        <Card>
+          <CardContent className="p-4">
+            <div className="space-y-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search courses, skills, or instructors..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
               </div>
-              <Select value={filterLevel} onValueChange={setFilterLevel}>
-                <SelectTrigger>
-                  <Filter className="h-4 w-4" />
-                  <SelectValue placeholder="All Levels" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">All Levels</SelectItem>
-                  <SelectItem value="Beginner">Beginner</SelectItem>
-                  <SelectItem value="Intermediate">Intermediate</SelectItem>
-                  <SelectItem value="Advanced">Advanced</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={filterCategory} onValueChange={setFilterCategory}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Categories" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
-                  <SelectItem value="Technology">Technology</SelectItem>
-                  <SelectItem value="Finance">Finance</SelectItem>
-                  <SelectItem value="Healthcare">Healthcare</SelectItem>
-                  <SelectItem value="Marketing">Marketing</SelectItem>
-                </SelectContent>
-              </Select>
+              
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                  <SelectTrigger className="w-full sm:w-48">
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map(category => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={selectedLevel} onValueChange={setSelectedLevel}>
+                  <SelectTrigger className="w-full sm:w-48">
+                    <SelectValue placeholder="Level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Levels</SelectItem>
+                    <SelectItem value="beginner">Beginner</SelectItem>
+                    <SelectItem value="intermediate">Intermediate</SelectItem>
+                    <SelectItem value="advanced">Advanced</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Results Summary */}
-        <div className="mb-6 flex items-center justify-between">
-          <p className="text-muted-foreground">
-            Showing {filteredCourses.length} course{filteredCourses.length !== 1 ? 's' : ''}
-          </p>
-          {profile?.industry && (
-            <Badge variant="outline">
-              Recommended for {profile.industry}
-            </Badge>
-          )}
-        </div>
+        {/* Featured Courses */}
+        {featuredCourses.length > 0 && (
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <TrendingUp className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-semibold text-foreground">Featured Courses</h2>
+            </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredCourses.map((course) => (
+                <Card key={course.id} className="hover:shadow-lg transition-shadow group">
+                  <div className="relative">
+                    <img 
+                      src={course.image} 
+                      alt={course.title}
+                      className="w-full h-48 object-cover rounded-t-lg bg-muted"
+                    />
+                    <Badge className="absolute top-3 left-3 bg-primary">Featured</Badge>
+                    {course.certificate && (
+                      <Badge className="absolute top-3 right-3 bg-green-600">
+                        <Award className="h-3 w-3 mr-1" />
+                        Certificate
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  <CardContent className="p-4 space-y-3">
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-foreground line-clamp-2 group-hover:text-primary transition-colors">
+                        {course.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {course.description}
+                      </p>
+                    </div>
 
-        {/* Course Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCourses.map((course) => (
-            <Card key={course.id} className="shadow-medium border-border hover:shadow-lg transition-all card-interactive">
-              <div className="aspect-video bg-gradient-to-br from-primary/10 to-secondary/10 rounded-t-lg flex items-center justify-center">
-                <PlayCircle className="h-12 w-12 text-primary" />
-              </div>
-              
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="line-clamp-2 mb-2">{course.title}</CardTitle>
-                    <CardDescription className="line-clamp-3 mb-3">
-                      {course.description}
-                    </CardDescription>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-2 mb-3">
-                  <Badge className={getLevelColor(course.level)}>
-                    {course.level}
-                  </Badge>
-                  <Badge variant="outline">{course.category}</Badge>
-                </div>
+                    <div className="flex items-center space-x-2">
+                      <img 
+                        src={course.instructorAvatar} 
+                        alt={course.instructor}
+                        className="w-6 h-6 rounded-full bg-muted"
+                      />
+                      <span className="text-sm text-muted-foreground">{course.instructor}</span>
+                    </div>
 
-                <div className="flex items-center space-x-4 text-sm text-muted-foreground mb-3">
-                  <div className="flex items-center space-x-1">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span>{course.rating}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Users className="h-4 w-4" />
-                    <span>{course.students.toLocaleString()}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Clock className="h-4 w-4" />
-                    <span>{course.duration}</span>
-                  </div>
-                </div>
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                      <div className="flex items-center space-x-1">
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        <span>{course.rating}</span>
+                        <span>({course.reviews})</span>
+                      </div>
+                      <Badge variant="secondary">{course.level}</Badge>
+                    </div>
 
-                <div className="flex flex-wrap gap-1 mb-3">
-                  {course.skills.slice(0, 3).map((skill, index) => (
-                    <Badge key={index} variant="secondary" className="text-xs">
-                      {skill}
-                    </Badge>
-                  ))}
-                  {course.skills.length > 3 && (
-                    <Badge variant="secondary" className="text-xs">
-                      +{course.skills.length - 3} more
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                      <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-1">
+                          <Clock className="h-4 w-4" />
+                          <span>{course.duration}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <Users className="h-4 w-4" />
+                          <span>{course.students.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1">
+                      {course.skills.slice(0, 3).map((skill, index) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {skill}
+                        </Badge>
+                      ))}
+                      {course.skills.length > 3 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{course.skills.length - 3} more
+                        </Badge>
+                      )}
+                    </div>
+
+                    <Button className="w-full" asChild>
+                      <Link to={`/course/${course.id}`}>
+                        <Play className="h-4 w-4 mr-2" />
+                        Start Learning
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* All Courses */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold text-foreground">
+              All Courses ({filteredCourses.length})
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredCourses.map((course) => (
+              <Card key={course.id} className="hover:shadow-lg transition-shadow group">
+                <div className="relative">
+                  <img 
+                    src={course.image} 
+                    alt={course.title}
+                    className="w-full h-48 object-cover rounded-t-lg bg-muted"
+                  />
+                  {course.certificate && (
+                    <Badge className="absolute top-3 right-3 bg-green-600">
+                      <Award className="h-3 w-3 mr-1" />
+                      Certificate
                     </Badge>
                   )}
                 </div>
-              </CardHeader>
-
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-2xl font-bold text-primary">${course.price}</span>
-                    <p className="text-sm text-muted-foreground">By {course.instructor}</p>
+                
+                <CardContent className="p-4 space-y-3">
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-foreground line-clamp-2 group-hover:text-primary transition-colors">
+                      {course.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {course.description}
+                    </p>
                   </div>
-                  <Button asChild>
+
+                  <div className="flex items-center space-x-2">
+                    <img 
+                      src={course.instructorAvatar} 
+                      alt={course.instructor}
+                      className="w-6 h-6 rounded-full bg-muted"
+                    />
+                    <span className="text-sm text-muted-foreground">{course.instructor}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <div className="flex items-center space-x-1">
+                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      <span>{course.rating}</span>
+                      <span>({course.reviews})</span>
+                    </div>
+                    <Badge variant="secondary">{course.level}</Badge>
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <div className="flex items-center space-x-4">
+                      <div className="flex items-center space-x-1">
+                        <Clock className="h-4 w-4" />
+                        <span>{course.duration}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <BookOpen className="h-4 w-4" />
+                        <span>{course.modules} modules</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-1">
+                    {course.skills.slice(0, 3).map((skill, index) => (
+                      <Badge key={index} variant="outline" className="text-xs">
+                        {skill}
+                      </Badge>
+                    ))}
+                    {course.skills.length > 3 && (
+                      <Badge variant="outline" className="text-xs">
+                        +{course.skills.length - 3} more
+                      </Badge>
+                    )}
+                  </div>
+
+                  <Button className="w-full" asChild>
                     <Link to={`/course/${course.id}`}>
-                      Enroll Now
+                      <Play className="h-4 w-4 mr-2" />
+                      Start Learning
                     </Link>
                   </Button>
-                </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {filteredCourses.length === 0 && (
+            <Card>
+              <CardContent className="p-8 text-center">
+                <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-foreground mb-2">No courses found</h3>
+                <p className="text-muted-foreground mb-4">
+                  Try adjusting your search criteria or browse all categories
+                </p>
+                <Button variant="outline" onClick={() => {
+                  setSearchTerm("");
+                  setSelectedCategory("all");
+                  setSelectedLevel("all");
+                }}>
+                  Clear Filters
+                </Button>
               </CardContent>
             </Card>
-          ))}
+          )}
         </div>
-
-        {filteredCourses.length === 0 && (
-          <Card className="text-center py-12">
-            <CardHeader>
-              <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <CardTitle>No Courses Found</CardTitle>
-              <CardDescription>
-                Try adjusting your search terms or filters to find relevant courses.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-        )}
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   );
 };
 

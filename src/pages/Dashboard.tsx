@@ -6,314 +6,331 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { 
-  Brain, User, TrendingUp, BookOpen, Award, Clock, 
-  Target, ArrowRight, Lightbulb, Star, LogOut
+  TrendingUp, 
+  BookOpen, 
+  Award, 
+  Target, 
+  Clock, 
+  Users,
+  ArrowRight,
+  Play,
+  CheckCircle,
+  AlertCircle,
+  BarChart3,
+  Calendar,
+  Zap
 } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
-import { useUserSkills } from "@/hooks/useSkills";
-import { useToast } from "@/hooks/use-toast";
+import { useSkills } from "@/hooks/useSkills";
+import { useRecommendations } from "@/hooks/useRecommendations";
+import { AppLayout } from "@/components/AppLayout";
 
 const Dashboard = () => {
-  const { user, signOut } = useAuth();
   const { data: profile } = useProfile();
-  const { data: userSkills } = useUserSkills();
-  const { toast } = useToast();
+  const { data: skills } = useSkills();
+  const { data: recommendations } = useRecommendations();
 
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      toast({
-        title: "Signed out successfully",
-        description: "See you next time!"
-      });
-    } catch (error) {
-      toast({
-        title: "Error signing out",
-        description: "Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  // Calculate overall progress
-  const overallProgress = userSkills?.length ? 
-    Math.round(userSkills.reduce((acc, skill) => acc + skill.current_level, 0) / userSkills.length) : 0;
-
-  // Mock data for recommendations (will be replaced with AI-generated recommendations later)
-  const recommendations = [
+  // Mock data for enhanced dashboard
+  const currentCourses = [
     {
-      title: "Complete Machine Learning Fundamentals",
-      description: "Boost your ML skills with our AI-powered course",
-      duration: "6 weeks",
-      impact: "High",
-      type: "Course"
+      id: 1,
+      title: "Advanced React Development",
+      progress: 75,
+      image: "/placeholder.svg",
+      nextLesson: "Context API Deep Dive",
+      timeLeft: "2h 30m",
+      instructor: "Sarah Johnson"
     },
     {
-      title: "AWS Solutions Architect Certification",
-      description: "Get cloud-ready with hands-on AWS training",
-      duration: "4 weeks", 
-      impact: "High",
-      type: "Certification"
-    },
-    {
-      title: "Advanced React Patterns Workshop",
-      description: "Master modern React development techniques",
-      duration: "2 weeks",
-      impact: "Medium",
-      type: "Workshop"
+      id: 2,
+      title: "Machine Learning Fundamentals",
+      progress: 45,
+      image: "/placeholder.svg",
+      nextLesson: "Linear Regression",
+      timeLeft: "4h 15m",
+      instructor: "Dr. Michael Chen"
     }
   ];
 
-  const recentActivity = [
-    { action: "Completed", item: "Python Basics Module", time: "2 hours ago" },
-    { action: "Started", item: "Data Structures Course", time: "1 day ago" },
-    { action: "Earned", item: "SQL Fundamentals Certificate", time: "3 days ago" },
-    { action: "Joined", item: "AI Study Group", time: "1 week ago" }
+  const recentAchievements = [
+    {
+      id: 1,
+      title: "JavaScript Expert",
+      description: "Completed advanced JavaScript course",
+      date: "2 days ago",
+      icon: Award,
+      color: "text-yellow-600"
+    },
+    {
+      id: 2,
+      title: "Quick Learner",
+      description: "Finished 3 courses this month",
+      date: "1 week ago",
+      icon: Zap,
+      color: "text-blue-600"
+    }
   ];
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "High": return "destructive";
-      case "Medium": return "warning";
-      case "Low": return "secondary";
-      default: return "secondary";
+  const upcomingDeadlines = [
+    {
+      id: 1,
+      title: "React Assessment",
+      date: "Tomorrow",
+      type: "Assessment",
+      priority: "high"
+    },
+    {
+      id: 2,
+      title: "Final Project Submission",
+      date: "In 3 days",
+      type: "Project",
+      priority: "medium"
     }
-  };
+  ];
 
-  const getImpactColor = (impact: string) => {
-    switch (impact) {
-      case "High": return "success";
-      case "Medium": return "warning";
-      case "Low": return "secondary";
-      default: return "secondary";
+  const stats = [
+    {
+      title: "Courses Completed",
+      value: "12",
+      change: "+3 this month",
+      icon: BookOpen,
+      color: "text-green-600"
+    },
+    {
+      title: "Skills Mastered",
+      value: "8",
+      change: "+2 this week",
+      icon: Target,
+      color: "text-blue-600"
+    },
+    {
+      title: "Certificates Earned",
+      value: "5",
+      change: "+1 this month",
+      icon: Award,
+      color: "text-purple-600"
+    },
+    {
+      title: "Study Hours",
+      value: "124",
+      change: "+8 this week",
+      icon: Clock,
+      color: "text-orange-600"
     }
-  };
+  ];
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card shadow-soft">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Link to="/" className="flex items-center space-x-2">
-              <Brain className="h-8 w-8 text-primary" />
-              <h1 className="text-2xl font-bold text-foreground">SkillUp AI</h1>
-            </Link>
-            <nav className="hidden md:flex items-center space-x-6 ml-8">
-              <Link to="/dashboard" className="text-primary font-medium">Dashboard</Link>
-              <Link to="/courses" className="text-muted-foreground hover:text-primary transition-smooth">Courses</Link>
-              <Link to="/progress" className="text-muted-foreground hover:text-primary transition-smooth">Progress</Link>
-              <Link to="/certificates" className="text-muted-foreground hover:text-primary transition-smooth">Certificates</Link>
-            </nav>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Button variant="ai" size="sm">
-              <Lightbulb className="h-4 w-4" />
-              AI Assistant
-            </Button>
-            <Button variant="ghost" size="icon" onClick={handleSignOut}>
-              <LogOut className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+    <AppLayout>
+      <div className="p-4 md:p-6 space-y-6">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-foreground mb-2">
-            Welcome back, {profile?.full_name || 'there'}! 👋
-          </h2>
+        <div className="space-y-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+            Welcome back, {profile?.first_name || 'Learner'}! 👋
+          </h1>
           <p className="text-muted-foreground">
-            Here's your personalized learning insights and recommendations.
+            Ready to continue your learning journey? Here's your progress overview.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left Column - Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Skill Gap Analysis */}
-            <Card className="shadow-medium border-border">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center space-x-2">
-                      <Target className="h-5 w-5 text-primary" />
-                      <span>Skill Gap Analysis</span>
-                    </CardTitle>
-                    <CardDescription>
-                      AI-generated insights based on your {profile?.role} role in {profile?.industry}
-                    </CardDescription>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {stats.map((stat, index) => (
+            <Card key={index} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-4">
+                <div className="flex items-center space-x-2">
+                  <stat.icon className={`h-5 w-5 ${stat.color}`} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+                    <p className="text-xs text-muted-foreground truncate">{stat.title}</p>
+                    <p className="text-xs text-green-600">{stat.change}</p>
                   </div>
-                  <Button variant="outline" size="sm">
-                    <TrendingUp className="h-4 w-4" />
-                    View Details
-                  </Button>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {userSkills?.map((userSkill, index) => (
-                  <div key={index} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-foreground">{userSkill.skills?.name}</span>
-                      <div className="flex items-center space-x-2">
-                        <Badge variant={getPriorityColor(userSkill.status === 'pending' ? 'High' : 'Medium') as any}>
-                          {userSkill.status === 'pending' ? 'High' : 'Medium'} Priority
-                        </Badge>
-                        <span className="text-sm text-muted-foreground">
-                          {userSkill.current_level}% / {userSkill.target_level}%
-                        </span>
-                      </div>
-                    </div>
-                    <div className="relative">
-                      <Progress value={userSkill.current_level} className="h-2" />
-                      <div 
-                        className="absolute top-0 h-2 border-r-2 border-primary"
-                        style={{ left: `${userSkill.target_level}%` }}
-                      />
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Gap: {userSkill.target_level - userSkill.current_level} points to reach target level
-                    </div>
-                  </div>
-                )) || (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Target className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p className="mb-2">No skills assessed yet</p>
-                    <Button variant="outline" size="sm" asChild>
-                      <Link to="/assessment">Take Skills Assessment</Link>
-                    </Button>
-                  </div>
-                )}
               </CardContent>
             </Card>
+          ))}
+        </div>
 
-            {/* AI Recommendations */}
-            <Card className="shadow-medium border-border">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Lightbulb className="h-5 w-5 text-primary" />
-                  <span>AI-Powered Recommendations</span>
-                </CardTitle>
-                <CardDescription>
-                  Personalized learning paths to close your skill gaps
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {recommendations.map((rec, index) => (
-                  <div key={index} className="p-4 border border-border rounded-lg card-interactive">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-foreground mb-1">{rec.title}</h4>
-                        <p className="text-sm text-muted-foreground mb-2">{rec.description}</p>
-                        <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-                          <div className="flex items-center space-x-1">
-                            <Clock className="h-3 w-3" />
-                            <span>{rec.duration}</span>
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Current Courses */}
+          <div className="lg:col-span-2 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-foreground">Continue Learning</h2>
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/courses">View All <ArrowRight className="h-4 w-4 ml-1" /></Link>
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              {currentCourses.map((course) => (
+                <Card key={course.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex space-x-4">
+                      <img 
+                        src={course.image} 
+                        alt={course.title}
+                        className="w-16 h-16 md:w-20 md:h-20 rounded-lg object-cover bg-muted"
+                      />
+                      <div className="flex-1 min-w-0 space-y-2">
+                        <div>
+                          <h3 className="font-semibold text-foreground truncate">{course.title}</h3>
+                          <p className="text-sm text-muted-foreground">by {course.instructor}</p>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Progress</span>
+                            <span className="font-medium">{course.progress}%</span>
                           </div>
-                          <Badge variant={getImpactColor(rec.impact) as any} className="text-xs">
-                            {rec.impact} Impact
-                          </Badge>
-                          <Badge variant="outline" className="text-xs">
-                            {rec.type}
-                          </Badge>
+                          <Progress value={course.progress} className="h-2" />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                            <Clock className="h-4 w-4" />
+                            <span>{course.timeLeft} left</span>
+                          </div>
+                          <Button size="sm" className="h-8">
+                            <Play className="h-4 w-4 mr-1" />
+                            Continue
+                          </Button>
                         </div>
                       </div>
-                      <Button variant="hero" size="sm">
-                        Start
-                        <ArrowRight className="h-4 w-4" />
-                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          {/* Sidebar Content */}
+          <div className="space-y-6">
+            {/* Upcoming Deadlines */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center">
+                  <Calendar className="h-5 w-5 mr-2" />
+                  Upcoming Deadlines
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {upcomingDeadlines.map((deadline) => (
+                  <div key={deadline.id} className="flex items-center space-x-3">
+                    <div className={`w-2 h-2 rounded-full ${
+                      deadline.priority === 'high' ? 'bg-red-500' : 'bg-yellow-500'
+                    }`} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">
+                        {deadline.title}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {deadline.type} • {deadline.date}
+                      </p>
                     </div>
                   </div>
                 ))}
+                <Button variant="outline" size="sm" className="w-full mt-3">
+                  View Calendar
+                </Button>
               </CardContent>
             </Card>
-          </div>
 
-          {/* Right Column - Sidebar */}
-          <div className="space-y-6">
-            {/* Progress Overview */}
-            <Card className="shadow-medium border-border">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <TrendingUp className="h-5 w-5 text-primary" />
-                  <span>Overall Progress</span>
+            {/* Recent Achievements */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center">
+                  <Award className="h-5 w-5 mr-2" />
+                  Recent Achievements
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-primary mb-2">{overallProgress}%</div>
-                  <Progress value={overallProgress} className="progress-glow" />
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {overallProgress > 50 ? "Great progress! Keep it up!" : "Get started with your first assessment!"}
-                  </p>
-                </div>
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
-                  <div className="text-center">
-                    <div className="text-lg font-semibold text-foreground">{userSkills?.length || 0}</div>
-                    <div className="text-xs text-muted-foreground">Skills Tracked</div>
+              <CardContent className="space-y-3">
+                {recentAchievements.map((achievement) => (
+                  <div key={achievement.id} className="flex items-start space-x-3">
+                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                      <achievement.icon className={`h-5 w-5 ${achievement.color}`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground">
+                        {achievement.title}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {achievement.description}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {achievement.date}
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-lg font-semibold text-foreground">0</div>
-                    <div className="text-xs text-muted-foreground">Certificates Earned</div>
-                  </div>
-                </div>
+                ))}
+                <Button variant="outline" size="sm" className="w-full mt-3" asChild>
+                  <Link to="/certificates">View All</Link>
+                </Button>
               </CardContent>
             </Card>
 
             {/* Quick Actions */}
-            <Card className="shadow-medium border-border">
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Quick Actions</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <Button variant="outline" className="w-full justify-start" asChild>
+              <CardContent className="space-y-2">
+                <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+                  <Link to="/assessment">
+                    <ClipboardCheck className="h-4 w-4 mr-2" />
+                    Take Assessment
+                  </Link>
+                </Button>
+                <Button variant="outline" size="sm" className="w-full justify-start" asChild>
                   <Link to="/courses">
-                    <BookOpen className="h-4 w-4" />
+                    <BookOpen className="h-4 w-4 mr-2" />
                     Browse Courses
                   </Link>
                 </Button>
-                <Button variant="outline" className="w-full justify-start" asChild>
-                  <Link to="/assessment">
-                    <Target className="h-4 w-4" />
-                    Take Skill Assessment
+                <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+                  <Link to="/progress">
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    View Progress
                   </Link>
                 </Button>
-                <Button variant="outline" className="w-full justify-start" asChild>
-                  <Link to="/certificates">
-                    <Award className="h-4 w-4" />
-                    View Certificates
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Recent Activity */}
-            <Card className="shadow-medium border-border">
-              <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {recentActivity.map((activity, index) => (
-                    <div key={index} className="flex items-start space-x-3 text-sm">
-                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
-                      <div className="flex-1">
-                        <span className="font-medium text-foreground">{activity.action}</span>
-                        <span className="text-muted-foreground"> {activity.item}</span>
-                        <div className="text-xs text-muted-foreground">{activity.time}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
               </CardContent>
             </Card>
           </div>
         </div>
-      </main>
-    </div>
+
+        {/* Skills Overview */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Target className="h-5 w-5 mr-2" />
+              Skill Progress Overview
+            </CardTitle>
+            <CardDescription>
+              Track your progress across different skill areas
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {skills?.slice(0, 6).map((skill) => (
+                <div key={skill.id} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-sm">{skill.name}</span>
+                    <Badge variant="secondary" className="text-xs">
+                      {skill.category}
+                    </Badge>
+                  </div>
+                  <Progress value={75} className="h-2" />
+                  <p className="text-xs text-muted-foreground">
+                    Level: Intermediate
+                  </p>
+                </div>
+              ))}
+            </div>
+            <Button variant="outline" className="w-full mt-4" asChild>
+              <Link to="/progress">View Detailed Progress</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    </AppLayout>
   );
 };
 
