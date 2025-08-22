@@ -18,7 +18,8 @@ import {
   AlertCircle,
   BarChart3,
   Calendar,
-  Zap
+  Zap,
+  ClipboardCheck
 } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
 import { useSkills } from "@/hooks/useSkills";
@@ -125,7 +126,7 @@ const Dashboard = () => {
         {/* Welcome Section */}
         <div className="space-y-2">
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-            Welcome back, {profile?.first_name || 'Learner'}! 👋
+            Welcome back, {profile?.full_name || 'Learner'}! 👋
           </h1>
           <p className="text-muted-foreground">
             Ready to continue your learning journey? Here's your progress overview.
