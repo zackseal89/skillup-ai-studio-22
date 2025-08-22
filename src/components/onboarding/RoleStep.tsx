@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { User, Users, TrendingUp, Shield, Wrench, Headphones } from 'lucide-react';
+import { User, Users, TrendingUp, Shield, Wrench, Headphones, Building2 } from 'lucide-react';
 
 const commonRoles = [
   { id: 'Manager', name: 'Manager / Team Lead', icon: Users },
@@ -11,7 +11,8 @@ const commonRoles = [
   { id: 'Administrator', name: 'Administrator', icon: Shield },
   { id: 'Specialist', name: 'Specialist / Expert', icon: User },
   { id: 'Technician', name: 'Technician', icon: Wrench },
-  { id: 'Support', name: 'Customer Support', icon: Headphones }
+  { id: 'Support', name: 'Customer Support', icon: Headphones },
+  { id: 'Other', name: 'Other', icon: Building2 }
 ];
 
 interface RoleStepProps {
@@ -21,12 +22,17 @@ interface RoleStepProps {
 
 const RoleStep: React.FC<RoleStepProps> = ({ value, onChange }) => {
   const [customRole, setCustomRole] = useState('');
-  const [showCustom, setShowCustom] = useState(false);
+  const [showCustom, setShowCustom] = useState(value === 'Other' || (value && !commonRoles.find(r => r.id === value)));
 
   const handleRoleSelect = (roleId: string) => {
-    onChange(roleId);
-    setShowCustom(false);
-    setCustomRole('');
+    if (roleId === 'Other') {
+      setShowCustom(true);
+      onChange('Other');
+    } else {
+      onChange(roleId);
+      setShowCustom(false);
+      setCustomRole('');
+    }
   };
 
   const handleCustomRoleSubmit = () => {
@@ -49,7 +55,7 @@ const RoleStep: React.FC<RoleStepProps> = ({ value, onChange }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {commonRoles.map((role) => {
           const IconComponent = role.icon;
-          const isSelected = value === role.id;
+          const isSelected = value === role.id || (role.id === 'Other' && showCustom);
           return (
             <Card
               key={role.id}
@@ -78,21 +84,12 @@ const RoleStep: React.FC<RoleStepProps> = ({ value, onChange }) => {
         })}
       </div>
 
-      <div className="text-center">
-        <button
-          onClick={() => setShowCustom(!showCustom)}
-          className="text-blue-600 hover:text-blue-700 font-medium"
-        >
-          Don't see your role? Add a custom one
-        </button>
-      </div>
-
       {showCustom && (
         <Card className="border-2 border-dashed border-blue-300">
           <CardContent className="p-4">
             <div className="space-y-3">
               <Input
-                placeholder="Enter your role (e.g., Marketing Coordinator, Sales Rep)"
+                placeholder="Enter your role (e.g., Marketing Coordinator, Sales Rep, UX Designer)"
                 value={customRole}
                 onChange={(e) => setCustomRole(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleCustomRoleSubmit()}
@@ -109,7 +106,7 @@ const RoleStep: React.FC<RoleStepProps> = ({ value, onChange }) => {
         </Card>
       )}
 
-      {value && !commonRoles.find(r => r.id === value) && (
+      {value && !commonRoles.find(r => r.id === value) && value !== 'Other' && (
         <Card className="bg-green-50 border-green-200">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">

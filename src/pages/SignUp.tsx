@@ -85,7 +85,7 @@ const SignUp = () => {
           title: "Welcome to SkillUp AI!",
           description: "Please check your email to verify your account."
         });
-        navigate("/dashboard");
+        navigate("/onboarding");
       }
     } catch (error) {
       toast({
