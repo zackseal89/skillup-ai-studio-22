@@ -49,6 +49,69 @@ export type Database = {
           },
         ]
       }
+      course_roadmaps: {
+        Row: {
+          generated_at: string
+          id: string
+          roadmap_content: string
+          user_id: string
+        }
+        Insert: {
+          generated_at?: string
+          id?: string
+          roadmap_content: string
+          user_id: string
+        }
+        Update: {
+          generated_at?: string
+          id?: string
+          roadmap_content?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      onboarding: {
+        Row: {
+          ai_skill_level: string
+          created_at: string
+          id: string
+          industry: string
+          learning_goals: string
+          learning_style: string[]
+          onboarding_completed: boolean
+          role: string
+          time_commitment: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_skill_level: string
+          created_at?: string
+          id?: string
+          industry: string
+          learning_goals: string
+          learning_style: string[]
+          onboarding_completed?: boolean
+          role: string
+          time_commitment: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_skill_level?: string
+          created_at?: string
+          id?: string
+          industry?: string
+          learning_goals?: string
+          learning_style?: string[]
+          onboarding_completed?: boolean
+          role?: string
+          time_commitment?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
