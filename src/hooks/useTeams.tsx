@@ -61,15 +61,8 @@ export const useTeamMembers = (teamId: string) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('team_members')
-        .select(`
-          *,
-          profiles (
-            full_name,
-            email,
-            industry,
-            role
-          )
-        `)
+        // Removed nested profiles selection to avoid relation typing errors
+        .select('*')
         .eq('team_id', teamId);
 
       if (error) throw error;
@@ -140,18 +133,20 @@ export const useTeamProgress = (teamId: string) => {
 
       if (membersError) throw membersError;
 
-      const userIds = members.map(m => m.user_id);
+      const userIds = (members || []).map(m => m.user_id);
+
+      if (userIds.length === 0) {
+        return {
+          progress: [],
+          userSkills: [],
+          memberCount: 0,
+        };
+      }
 
       // Get progress for all team members
       const { data: progress, error: progressError } = await supabase
         .from('progress')
-        .select(`
-          *,
-          profiles (
-            full_name,
-            email
-          )
-        `)
+        .select('*')
         .in('user_id', userIds);
 
       if (progressError) throw progressError;
@@ -164,10 +159,6 @@ export const useTeamProgress = (teamId: string) => {
           skills (
             name,
             category
-          ),
-          profiles (
-            full_name,
-            email
           )
         `)
         .in('user_id', userIds);
@@ -183,3 +174,4 @@ export const useTeamProgress = (teamId: string) => {
     enabled: !!teamId,
   });
 };
+
