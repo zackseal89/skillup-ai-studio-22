@@ -407,6 +407,10 @@ export type Database = {
         Args: { invitation_id: string }
         Returns: boolean
       }
+      is_manager_in_company: {
+        Args: { _company_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
