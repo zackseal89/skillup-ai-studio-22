@@ -107,6 +107,20 @@ export const useEnrollInCourse = () => {
     mutationFn: async (courseId: string) => {
       if (!user?.id) throw new Error('No user');
 
+      // Check if already enrolled first
+      const { data: existing } = await supabase
+        .from('course_enrollments')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('course_id', courseId)
+        .eq('status', 'active')
+        .maybeSingle();
+
+      if (existing) {
+        return existing;
+      }
+
+      // Insert new enrollment
       const { data, error } = await supabase
         .from('course_enrollments')
         .insert({
@@ -116,7 +130,20 @@ export const useEnrollInCourse = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        // Handle duplicate key error gracefully
+        if (error.code === '23505') {
+          // Fetch the existing enrollment
+          const { data: existingData } = await supabase
+            .from('course_enrollments')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('course_id', courseId)
+            .single();
+          return existingData;
+        }
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {

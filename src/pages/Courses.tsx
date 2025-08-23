@@ -22,7 +22,7 @@ import {
   Target
 } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
-import { useCourses, useFeaturedCourses, useEnrollInCourse } from "@/hooks/useCourses";
+import { useCourses, useFeaturedCourses, useEnrollInCourse, useUserEnrollments } from "@/hooks/useCourses";
 import { CourseOnboarding } from "@/components/CourseOnboarding";
 import { useToast } from "@/hooks/use-toast";
 
@@ -39,6 +39,7 @@ const Courses = () => {
     search: searchTerm
   });
   const { data: featuredCourses } = useFeaturedCourses();
+  const { data: userEnrollments } = useUserEnrollments();
   const enrollInCourseMutation = useEnrollInCourse();
 
   const categories = [
@@ -86,6 +87,10 @@ const Courses = () => {
     
     return matchesSearch && matchesCategory && matchesLevel;
   }) || [];
+
+  const isEnrolled = (courseId: string) => {
+    return userEnrollments?.some(enrollment => enrollment.course_id === courseId) || false;
+  };
 
   return (
     <AppLayout>
@@ -218,9 +223,13 @@ const Courses = () => {
                       )}
                     </div>
 
-                    <Button className="w-full" onClick={() => handleEnroll(course.id, course.title)}>
+                    <Button 
+                      className="w-full" 
+                      onClick={() => handleEnroll(course.id, course.title)}
+                      disabled={isEnrolled(course.id)}
+                    >
                       <Play className="h-4 w-4 mr-2" />
-                      Enroll Now
+                      {isEnrolled(course.id) ? "Enrolled" : "Enroll Now"}
                     </Button>
                   </CardContent>
                 </Card>
@@ -304,9 +313,13 @@ const Courses = () => {
                     )}
                   </div>
 
-                  <Button className="w-full" onClick={() => handleEnroll(course.id, course.title)}>
+                  <Button 
+                    className="w-full" 
+                    onClick={() => handleEnroll(course.id, course.title)}
+                    disabled={isEnrolled(course.id)}
+                  >
                     <Play className="h-4 w-4 mr-2" />
-                    Enroll Now
+                    {isEnrolled(course.id) ? "Enrolled" : "Enroll Now"}
                   </Button>
                 </CardContent>
               </Card>
