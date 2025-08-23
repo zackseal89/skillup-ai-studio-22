@@ -615,7 +615,53 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      team_member_profiles: {
+        Row: {
+          company_id: string | null
+          created_at: string | null
+          experience_level: string | null
+          full_name: string | null
+          id: string | null
+          industry: string | null
+          is_manager: boolean | null
+          role: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string | null
+          experience_level?: string | null
+          full_name?: string | null
+          id?: string | null
+          industry?: string | null
+          is_manager?: boolean | null
+          role?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string | null
+          experience_level?: string | null
+          full_name?: string | null
+          id?: string | null
+          industry?: string | null
+          is_manager?: boolean | null
+          role?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       accept_team_invitation: {
@@ -632,6 +678,14 @@ export type Database = {
       }
       is_manager_in_company: {
         Args: { _company_id: string }
+        Returns: boolean
+      }
+      update_team_member_profile: {
+        Args: {
+          new_experience_level?: string
+          new_role?: string
+          target_user_id: string
+        }
         Returns: boolean
       }
     }
