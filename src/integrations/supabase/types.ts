@@ -198,21 +198,33 @@ export type Database = {
       }
       course_roadmaps: {
         Row: {
+          agent_type: string | null
+          exercises: Json | null
           generated_at: string
           id: string
+          resources: Json | null
           roadmap_content: string
+          topic: string | null
           user_id: string
         }
         Insert: {
+          agent_type?: string | null
+          exercises?: Json | null
           generated_at?: string
           id?: string
+          resources?: Json | null
           roadmap_content: string
+          topic?: string | null
           user_id: string
         }
         Update: {
+          agent_type?: string | null
+          exercises?: Json | null
           generated_at?: string
           id?: string
+          resources?: Json | null
           roadmap_content?: string
+          topic?: string | null
           user_id?: string
         }
         Relationships: []
