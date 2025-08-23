@@ -44,31 +44,28 @@ export const useCompany = () => {
 
 export const useCreateCompany = () => {
   const queryClient = useQueryClient();
-  const { user } = useAuth();
 
   return useMutation({
     mutationFn: async (companyData: { name: string; company_code: string }) => {
-      // Create the company
-      const { data: company, error: companyError } = await supabase
-        .from('companies')
-        .insert(companyData)
-        .select()
-        .single();
+      // Use the atomic database function to create company and update profile
+      const { data, error } = await supabase.rpc('create_company_and_update_profile', {
+        company_name: companyData.name,
+        company_code: companyData.company_code
+      });
 
-      if (companyError) throw companyError;
+      if (error) {
+        console.error('Database function error:', error);
+        throw new Error(`Failed to create company: ${error.message}`);
+      }
 
-      // Update user's profile to link to this company and make them a manager
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({ 
-          company_id: company.id,
-          is_manager: true 
-        })
-        .eq('user_id', user?.id);
+      // Type the response properly
+      const result = data as unknown as { success: boolean; error?: string; company?: Company };
+      
+      if (!result?.success) {
+        throw new Error(result?.error || 'Failed to create company');
+      }
 
-      if (profileError) throw profileError;
-
-      return company;
+      return result.company as Company;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['company'] });

@@ -490,6 +490,10 @@ export type Database = {
         Args: { invitation_id: string }
         Returns: boolean
       }
+      create_company_and_update_profile: {
+        Args: { company_code: string; company_name: string }
+        Returns: Json
+      }
       is_manager_in_company: {
         Args: { _company_id: string }
         Returns: boolean
