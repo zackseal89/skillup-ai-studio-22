@@ -482,6 +482,77 @@ export type Database = {
         }
         Relationships: []
       }
+      quiz_responses: {
+        Row: {
+          answers: Json
+          completed_at: string
+          feedback: Json | null
+          grade_percentage: number | null
+          id: string
+          quiz_id: string
+          user_id: string
+        }
+        Insert: {
+          answers: Json
+          completed_at?: string
+          feedback?: Json | null
+          grade_percentage?: number | null
+          id?: string
+          quiz_id: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          completed_at?: string
+          feedback?: Json | null
+          grade_percentage?: number | null
+          id?: string
+          quiz_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_responses_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quizzes: {
+        Row: {
+          course_id: string | null
+          created_at: string
+          difficulty_level: string
+          id: string
+          module_content: string | null
+          module_id: string | null
+          questions: Json
+          user_id: string
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string
+          difficulty_level?: string
+          id?: string
+          module_content?: string | null
+          module_id?: string | null
+          questions: Json
+          user_id: string
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string
+          difficulty_level?: string
+          id?: string
+          module_content?: string | null
+          module_id?: string | null
+          questions?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       skills: {
         Row: {
           category: string
