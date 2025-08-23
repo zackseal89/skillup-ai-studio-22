@@ -73,6 +73,38 @@ export type Database = {
         }
         Relationships: []
       }
+      course_enrollments: {
+        Row: {
+          course_id: string
+          enrolled_at: string
+          id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          course_id: string
+          enrolled_at?: string
+          id?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          course_id?: string
+          enrolled_at?: string
+          id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_enrollments_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_roadmaps: {
         Row: {
           generated_at: string
@@ -91,6 +123,57 @@ export type Database = {
           id?: string
           roadmap_content?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      courses: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          difficulty_level: string
+          duration: string
+          has_certificate: boolean
+          id: string
+          industry: string
+          instructor: string
+          is_featured: boolean
+          modules: number
+          skills: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          difficulty_level?: string
+          duration: string
+          has_certificate?: boolean
+          id?: string
+          industry: string
+          instructor: string
+          is_featured?: boolean
+          modules?: number
+          skills?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          difficulty_level?: string
+          duration?: string
+          has_certificate?: boolean
+          id?: string
+          industry?: string
+          instructor?: string
+          is_featured?: boolean
+          modules?: number
+          skills?: string[]
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
