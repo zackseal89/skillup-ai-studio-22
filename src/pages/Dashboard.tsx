@@ -30,6 +30,7 @@ import { useRoadmaps } from "@/hooks/useRoadmaps";
 import { useUserEnrollments } from "@/hooks/useCourses";
 import { AppLayout } from "@/components/AppLayout";
 import { TeachingAgentPanel } from "@/components/TeachingAgentPanel";
+import { SkillGapAnalyzer } from "@/components/SkillGapAnalyzer";
 
 const Dashboard = () => {
   const { data: profile } = useProfile();
@@ -317,6 +318,9 @@ const Dashboard = () => {
 
         {/* AI Teaching Agent */}
         <TeachingAgentPanel />
+
+        {/* Skill Gap Analyzer */}
+        <SkillGapAnalyzer />
 
         {/* Skills Overview */}
         <Card>
