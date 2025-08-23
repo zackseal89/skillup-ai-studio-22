@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_interactions: {
+        Row: {
+          created_at: string
+          id: string
+          input_prompt: string
+          interaction_type: string
+          model_used: string
+          output_response: string
+          tokens_consumed: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          input_prompt: string
+          interaction_type: string
+          model_used?: string
+          output_response: string
+          tokens_consumed?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          input_prompt?: string
+          interaction_type?: string
+          model_used?: string
+          output_response?: string
+          tokens_consumed?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       calendar_events: {
         Row: {
           course_id: string | null
