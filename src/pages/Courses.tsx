@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { useCourses, useFeaturedCourses, useEnrollInCourse } from "@/hooks/useCourses";
+import { CourseOnboarding } from "@/components/CourseOnboarding";
 import { useToast } from "@/hooks/use-toast";
 
 const Courses = () => {
@@ -30,6 +31,7 @@ const Courses = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedLevel, setSelectedLevel] = useState("all");
+  const [onboardingCourse, setOnboardingCourse] = useState<{id: string, title: string} | null>(null);
   
   const { data: courses, isLoading } = useCourses({
     category: selectedCategory,
@@ -53,12 +55,18 @@ const Courses = () => {
     { id: "Quality Assurance", name: "Quality Assurance", icon: Target }
   ];
 
-  const handleEnroll = async (courseId: string) => {
+  const handleEnroll = async (courseId: string, courseTitle: string) => {
+    setOnboardingCourse({ id: courseId, title: courseTitle });
+  };
+
+  const handleOnboardingComplete = async () => {
+    if (!onboardingCourse) return;
+    
     try {
-      await enrollInCourseMutation.mutateAsync(courseId);
+      await enrollInCourseMutation.mutateAsync(onboardingCourse.id);
       toast({
         title: "Enrolled Successfully!",
-        description: "You've been enrolled in the course. Start learning now!"
+        description: "You've been enrolled with personalized settings!"
       });
     } catch (error) {
       toast({
@@ -210,7 +218,7 @@ const Courses = () => {
                       )}
                     </div>
 
-                    <Button className="w-full" onClick={() => handleEnroll(course.id)}>
+                    <Button className="w-full" onClick={() => handleEnroll(course.id, course.title)}>
                       <Play className="h-4 w-4 mr-2" />
                       Enroll Now
                     </Button>
@@ -296,7 +304,7 @@ const Courses = () => {
                     )}
                   </div>
 
-                  <Button className="w-full" onClick={() => handleEnroll(course.id)}>
+                  <Button className="w-full" onClick={() => handleEnroll(course.id, course.title)}>
                     <Play className="h-4 w-4 mr-2" />
                     Enroll Now
                   </Button>
@@ -325,6 +333,17 @@ const Courses = () => {
           )}
         </div>
       </div>
+
+      {/* Course Onboarding Modal */}
+      {onboardingCourse && (
+        <CourseOnboarding
+          isOpen={!!onboardingCourse}
+          onClose={() => setOnboardingCourse(null)}
+          courseId={onboardingCourse.id}
+          courseTitle={onboardingCourse.title}
+          onComplete={handleOnboardingComplete}
+        />
+      )}
     </AppLayout>
   );
 };

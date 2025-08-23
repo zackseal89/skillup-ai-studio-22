@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      calendar_events: {
+        Row: {
+          course_id: string | null
+          created_at: string | null
+          description: string | null
+          event_date: string
+          event_time: string | null
+          event_type: string
+          id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          event_date: string
+          event_time?: string | null
+          event_type: string
+          id?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          event_date?: string
+          event_time?: string | null
+          event_type?: string
+          id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendar_events_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       certifications: {
         Row: {
           certificate_name: string
@@ -105,6 +149,53 @@ export type Database = {
           },
         ]
       }
+      course_personalization: {
+        Row: {
+          course_id: string
+          created_at: string | null
+          current_knowledge_level: number | null
+          custom_goals: string | null
+          difficulty_preference: string | null
+          id: string
+          learning_preferences: Json | null
+          time_preference: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string | null
+          current_knowledge_level?: number | null
+          custom_goals?: string | null
+          difficulty_preference?: string | null
+          id?: string
+          learning_preferences?: Json | null
+          time_preference?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string | null
+          current_knowledge_level?: number | null
+          custom_goals?: string | null
+          difficulty_preference?: string | null
+          id?: string
+          learning_preferences?: Json | null
+          time_preference?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_personalization_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_roadmaps: {
         Row: {
           generated_at: string
@@ -176,6 +267,47 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      learning_sessions: {
+        Row: {
+          course_id: string | null
+          created_at: string | null
+          duration_minutes: number | null
+          ended_at: string | null
+          id: string
+          session_type: string
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string | null
+          duration_minutes?: number | null
+          ended_at?: string | null
+          id?: string
+          session_type: string
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string | null
+          duration_minutes?: number | null
+          ended_at?: string | null
+          id?: string
+          session_type?: string
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_sessions_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       onboarding: {
         Row: {
@@ -493,6 +625,10 @@ export type Database = {
       create_company_and_update_profile: {
         Args: { company_code: string; company_name: string }
         Returns: Json
+      }
+      end_learning_session: {
+        Args: { session_id: string }
+        Returns: boolean
       }
       is_manager_in_company: {
         Args: { _company_id: string }
