@@ -29,6 +29,7 @@ import { useCertificates } from "@/hooks/useCertificates";
 import { useRoadmaps } from "@/hooks/useRoadmaps";
 import { useUserEnrollments } from "@/hooks/useCourses";
 import { AppLayout } from "@/components/AppLayout";
+import { TeachingAgentPanel } from "@/components/TeachingAgentPanel";
 
 const Dashboard = () => {
   const { data: profile } = useProfile();
@@ -313,6 +314,9 @@ const Dashboard = () => {
             </Card>
           </div>
         </div>
+
+        {/* AI Teaching Agent */}
+        <TeachingAgentPanel />
 
         {/* Skills Overview */}
         <Card>
