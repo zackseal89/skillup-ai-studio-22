@@ -26,6 +26,11 @@ import { TeamUpload } from "@/components/manager/TeamUpload";
 import { ManagerRecommendations } from "@/components/manager/ManagerRecommendations";
 import { UserRoleManagement } from "@/components/manager/UserRoleManagement";
 import { CompanySetup } from "@/components/manager/CompanySetup";
+import { ManagerSkillGapAnalyzer } from "@/components/manager/ManagerSkillGapAnalyzer";
+import { PathSuggestionEngine } from "@/components/manager/PathSuggestionEngine";
+import { TrendInsights } from "@/components/manager/TrendInsights";
+import { EnhancedTeamProgress } from "@/components/manager/EnhancedTeamProgress";
+import { OneClickUpskillingPlan } from "@/components/manager/OneClickUpskillingPlan";
 
 const ManagerDashboard = () => {
   const { data: profile } = useProfile();
@@ -124,176 +129,76 @@ const ManagerDashboard = () => {
 
         {/* Main Content Tabs - only show if company exists */}
         {company && (
-          <Tabs defaultValue="teams" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="teams" className="flex items-center">
+          <Tabs defaultValue="overview" className="w-full">
+            <TabsList className="grid w-full grid-cols-5">
+              <TabsTrigger value="overview" className="flex items-center">
                 <Users className="h-4 w-4 mr-2" />
-                Team Management
+                Team Overview
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="flex items-center">
+                <TrendingUp className="h-4 w-4 mr-2" />
+                Skill Analytics
+              </TabsTrigger>
+              <TabsTrigger value="recommendations" className="flex items-center">
+                <Target className="h-4 w-4 mr-2" />
+                AI Recommendations
+              </TabsTrigger>
+              <TabsTrigger value="insights" className="flex items-center">
+                <AlertCircle className="h-4 w-4 mr-2" />
+                Trend Insights
               </TabsTrigger>
               <TabsTrigger value="users" className="flex items-center">
                 <UserCog className="h-4 w-4 mr-2" />
-                User Roles
+                User Management
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="teams" className="space-y-6">
-              {/* Create Team Button */}
-              <div className="flex justify-end">
-                <Dialog open={showCreateTeam} onOpenChange={setShowCreateTeam}>
-                  <DialogTrigger asChild>
-                    <Button>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Create Team
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Create New Team</DialogTitle>
-                      <DialogDescription>
-                        Create a new team to manage learners and track progress.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="team-name">Team Name</Label>
-                        <Input
-                          id="team-name"
-                          value={newTeamName}
-                          onChange={(e) => setNewTeamName(e.target.value)}
-                          placeholder="e.g., Finance Team, Marketing Department"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="team-description">Description (Optional)</Label>
-                        <Input
-                          id="team-description"
-                          value={newTeamDescription}
-                          onChange={(e) => setNewTeamDescription(e.target.value)}
-                          placeholder="Brief description of the team"
-                        />
-                      </div>
-                      <div className="flex justify-end gap-2">
-                        <Button variant="outline" onClick={() => setShowCreateTeam(false)}>
-                          Cancel
-                        </Button>
-                        <Button onClick={handleCreateTeam} disabled={createTeam.isPending}>
-                          {createTeam.isPending ? "Creating..." : "Create Team"}
-                        </Button>
-                      </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
-
-              {/* Team Selector */}
-              {teams && teams.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Select Team</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid md:grid-cols-3 gap-3">
-                      {teams.map((team) => (
-                        <Card 
-                          key={team.id} 
-                          className={`cursor-pointer transition-colors ${
-                            selectedTeam === team.id ? 'ring-2 ring-primary' : 'hover:bg-muted/50'
-                          }`}
-                          onClick={() => setSelectedTeam(team.id)}
-                        >
-                          <CardContent className="p-4">
-                            <h3 className="font-medium">{team.name}</h3>
-                            {team.description && (
-                              <p className="text-sm text-muted-foreground mt-1">
-                                {team.description}
-                              </p>
-                            )}
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* No Teams State */}
-              {teams && teams.length === 0 && (
+            <TabsContent value="overview" className="space-y-6">
+              <TrendInsights />
+              {selectedTeam ? (
+                <EnhancedTeamProgress teamId={selectedTeam} />
+              ) : (
                 <Card>
                   <CardContent className="p-8 text-center">
-                    <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="font-semibold mb-2">No Teams Yet</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Create your first team to start managing learners and tracking progress.
-                    </p>
-                    <Button onClick={() => setShowCreateTeam(true)}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Create Your First Team
-                    </Button>
+                    <p className="text-muted-foreground">Select a team to view detailed progress analytics</p>
                   </CardContent>
                 </Card>
               )}
+            </TabsContent>
 
-              {/* Team Dashboard Content */}
-              {selectedTeam && currentTeam && (
-                <>
-                  {/* Stats Grid */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {stats.map((stat, index) => (
-                      <Card key={index}>
-                        <CardContent className="p-4">
-                          <div className="flex items-center space-x-2">
-                            <stat.icon className={`h-5 w-5 ${stat.color}`} />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-                              <p className="text-xs text-muted-foreground truncate">{stat.title}</p>
-                              <p className="text-xs text-green-600">{stat.change}</p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-
-                  {/* Team Management Actions */}
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <TeamUpload teamId={selectedTeam} />
-                    
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center">
-                          <UserPlus className="h-5 w-5 mr-2" />
-                          Invite Team Member
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div>
-                          <Label htmlFor="invite-email">Email Address</Label>
-                          <Input
-                            id="invite-email"
-                            type="email"
-                            value={inviteEmail}
-                            onChange={(e) => setInviteEmail(e.target.value)}
-                            placeholder="colleague@company.com"
-                          />
-                        </div>
-                        <Button 
-                          onClick={handleInviteMember}
-                          disabled={inviteTeamMember.isPending || !inviteEmail.trim()}
-                          className="w-full"
-                        >
-                          {inviteTeamMember.isPending ? "Sending..." : "Send Invitation"}
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* Team Overview */}
-                  <TeamOverview teamId={selectedTeam} />
-
-                  {/* Manager Recommendations */}
-                  <ManagerRecommendations teamId={selectedTeam} />
-                </>
+            <TabsContent value="analytics" className="space-y-6">
+              {selectedTeam ? (
+                <ManagerSkillGapAnalyzer teamId={selectedTeam} />
+              ) : (
+                <Card>
+                  <CardContent className="p-8 text-center">
+                    <p className="text-muted-foreground">Select a team to analyze skill gaps</p>
+                  </CardContent>
+                </Card>
               )}
+            </TabsContent>
+
+            <TabsContent value="recommendations" className="space-y-6">
+              {selectedTeam ? (
+                <div className="space-y-6">
+                  <PathSuggestionEngine teamId={selectedTeam} />
+                  <OneClickUpskillingPlan teamId={selectedTeam} />
+                </div>
+              ) : (
+                <Card>
+                  <CardContent className="p-8 text-center">
+                    <p className="text-muted-foreground">Select a team to get AI recommendations</p>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+
+            <TabsContent value="insights" className="space-y-6">
+              <TrendInsights />
+            </TabsContent>
+
+            <TabsContent value="users" className="space-y-6">
+              <UserRoleManagement />
             </TabsContent>
 
             <TabsContent value="users" className="space-y-6">

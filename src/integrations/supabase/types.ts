@@ -313,6 +313,45 @@ export type Database = {
         }
         Relationships: []
       }
+      learning_path_suggestions: {
+        Row: {
+          ai_confidence_score: number | null
+          created_at: string
+          difficulty_level: string
+          estimated_duration: string | null
+          generated_by: string
+          id: string
+          skills_covered: Json
+          suggested_courses: Json
+          target_role: string
+          team_id: string | null
+        }
+        Insert: {
+          ai_confidence_score?: number | null
+          created_at?: string
+          difficulty_level?: string
+          estimated_duration?: string | null
+          generated_by?: string
+          id?: string
+          skills_covered?: Json
+          suggested_courses?: Json
+          target_role: string
+          team_id?: string | null
+        }
+        Update: {
+          ai_confidence_score?: number | null
+          created_at?: string
+          difficulty_level?: string
+          estimated_duration?: string | null
+          generated_by?: string
+          id?: string
+          skills_covered?: Json
+          suggested_courses?: Json
+          target_role?: string
+          team_id?: string | null
+        }
+        Relationships: []
+      }
       learning_sessions: {
         Row: {
           course_id: string | null
@@ -653,6 +692,42 @@ export type Database = {
           },
         ]
       }
+      team_skill_assessments: {
+        Row: {
+          assessment_type: string
+          created_at: string
+          employee_profiles: Json
+          id: string
+          job_roles: Json
+          manager_id: string
+          skill_gaps_data: Json | null
+          team_id: string
+          updated_at: string
+        }
+        Insert: {
+          assessment_type?: string
+          created_at?: string
+          employee_profiles?: Json
+          id?: string
+          job_roles?: Json
+          manager_id: string
+          skill_gaps_data?: Json | null
+          team_id: string
+          updated_at?: string
+        }
+        Update: {
+          assessment_type?: string
+          created_at?: string
+          employee_profiles?: Json
+          id?: string
+          job_roles?: Json
+          manager_id?: string
+          skill_gaps_data?: Json | null
+          team_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       teams: {
         Row: {
           company_id: string | null
@@ -690,6 +765,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      trend_data: {
+        Row: {
+          created_at: string
+          data_source: string | null
+          demand_score: number | null
+          growth_percentage: number | null
+          id: string
+          time_period: string | null
+          trend_name: string
+          trend_type: string
+          trend_value: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data_source?: string | null
+          demand_score?: number | null
+          growth_percentage?: number | null
+          id?: string
+          time_period?: string | null
+          trend_name: string
+          trend_type?: string
+          trend_value?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data_source?: string | null
+          demand_score?: number | null
+          growth_percentage?: number | null
+          id?: string
+          time_period?: string | null
+          trend_name?: string
+          trend_type?: string
+          trend_value?: Json
+          updated_at?: string
+        }
+        Relationships: []
       }
       user_skills: {
         Row: {
