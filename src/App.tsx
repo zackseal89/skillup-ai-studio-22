@@ -14,6 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import ManagerDashboard from "./pages/ManagerDashboard";
 import Onboarding from "./pages/Onboarding";
 import Assessment from "./pages/Assessment";
+import SkillSelection from "./pages/SkillSelection";
 import Courses from "./pages/Courses";
 import CourseView from "./pages/CourseView";
 import Progress from "./pages/Progress";
@@ -58,6 +59,11 @@ const App = () => (
               </ProtectedRoute>
             } />
             <Route path="/assessment" element={
+              <ProtectedRoute>
+                <SkillSelection />
+              </ProtectedRoute>
+            } />
+            <Route path="/assessment/:skillId" element={
               <ProtectedRoute>
                 <Assessment />
               </ProtectedRoute>

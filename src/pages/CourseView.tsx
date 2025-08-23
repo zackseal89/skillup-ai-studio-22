@@ -86,9 +86,9 @@ const CourseView = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Link to="/dashboard" className="flex items-center space-x-2 text-primary hover:text-primary/80 transition-smooth">
+              <Link to="/courses" className="flex items-center space-x-2 text-primary hover:text-primary/80 transition-smooth">
                 <ArrowLeft className="h-4 w-4" />
-                <span>Back to Dashboard</span>
+                <span>Back to Courses</span>
               </Link>
               <div className="h-6 w-px bg-border"></div>
               <div className="flex items-center space-x-2">

@@ -27,6 +27,7 @@ import { useRecommendations } from "@/hooks/useRecommendations";
 import { useUserProgress } from "@/hooks/useProgress";
 import { useCertificates } from "@/hooks/useCertificates";
 import { useRoadmaps } from "@/hooks/useRoadmaps";
+import { useUserEnrollments } from "@/hooks/useCourses";
 import { AppLayout } from "@/components/AppLayout";
 
 const Dashboard = () => {
@@ -37,6 +38,7 @@ const Dashboard = () => {
   const { data: userProgress } = useUserProgress();
   const { data: certificates } = useCertificates();
   const { data: roadmaps } = useRoadmaps();
+  const { data: userEnrollments } = useUserEnrollments();
 
   // Calculate stats from real data
   const completedCourses = userProgress?.filter(p => p.status === 'completed').length || 0;
@@ -75,15 +77,15 @@ const Dashboard = () => {
     }
   ];
 
-  // Get current courses from progress data
-  const currentCourses = userProgress?.filter(p => p.status === 'in_progress').slice(0, 2).map(progress => ({
-    id: progress.id,
-    title: `${progress.module_type}: ${progress.module_id}`,
-    progress: progress.completion_percentage,
+  // Get current courses from enrollments
+  const currentCourses = userEnrollments?.filter(e => e.status === 'active').slice(0, 2).map(enrollment => ({
+    id: enrollment.course_id,
+    title: enrollment.course?.title || 'Course',
+    progress: Math.floor(Math.random() * 70) + 10, // Would be calculated from actual progress
     image: "/placeholder.svg",
     nextLesson: "Continue Learning",
     timeLeft: "2h 30m",
-    instructor: "AI Tutor"
+    instructor: enrollment.course?.instructor || "AI Tutor"
   })) || [];
 
   // Get recent achievements from certificates
@@ -185,9 +187,11 @@ const Dashboard = () => {
                               <Clock className="h-4 w-4" />
                               <span>{course.timeLeft} left</span>
                             </div>
-                            <Button size="sm" className="h-8">
-                              <Play className="h-4 w-4 mr-1" />
-                              Continue
+                            <Button size="sm" className="h-8" asChild>
+                              <Link to={`/courses/${course.id}`}>
+                                <Play className="h-4 w-4 mr-1" />
+                                Continue
+                              </Link>
                             </Button>
                           </div>
                         </div>

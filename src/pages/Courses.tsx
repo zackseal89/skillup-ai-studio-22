@@ -22,148 +22,62 @@ import {
   Target
 } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
+import { useCourses, useFeaturedCourses, useEnrollInCourse } from "@/hooks/useCourses";
+import { useToast } from "@/hooks/use-toast";
 
 const Courses = () => {
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedLevel, setSelectedLevel] = useState("all");
+  
+  const { data: courses, isLoading } = useCourses({
+    category: selectedCategory,
+    difficulty: selectedLevel,
+    search: searchTerm
+  });
+  const { data: featuredCourses } = useFeaturedCourses();
+  const enrollInCourseMutation = useEnrollInCourse();
 
   const categories = [
     { id: "all", name: "All Categories", icon: BookOpen },
-    { id: "technology", name: "Technology", icon: Code },
-    { id: "business", name: "Business", icon: Briefcase },
-    { id: "leadership", name: "Leadership", icon: Target },
-    { id: "ai", name: "AI & Machine Learning", icon: Brain }
+    { id: "AI Communication", name: "AI Communication", icon: Brain },
+    { id: "Risk Management", name: "Risk Management", icon: Target },
+    { id: "Automation", name: "Automation", icon: Code },
+    { id: "Machine Learning", name: "Machine Learning", icon: Brain },
+    { id: "Documentation", name: "Documentation", icon: BookOpen },
+    { id: "Diagnostics", name: "Diagnostics", icon: Target },
+    { id: "Patient Care", name: "Patient Care", icon: Target },
+    { id: "Analytics", name: "Analytics", icon: TrendingUp },
+    { id: "Development", name: "Development", icon: Code },
+    { id: "Quality Assurance", name: "Quality Assurance", icon: Target }
   ];
 
-  const courses = [
-    {
-      id: 1,
-      title: "Advanced React Development",
-      description: "Master modern React patterns, hooks, and state management for building scalable applications.",
-      instructor: "Sarah Johnson",
-      instructorAvatar: "/placeholder.svg",
-      duration: "12 weeks",
-      students: 2847,
-      rating: 4.8,
-      reviews: 234,
-      level: "Advanced",
-      category: "technology",
-      image: "/placeholder.svg",
-      price: "Free",
-      skills: ["React", "JavaScript", "State Management"],
-      modules: 15,
-      certificate: true,
-      featured: true
-    },
-    {
-      id: 2,
-      title: "Machine Learning Fundamentals",
-      description: "Learn the core concepts of machine learning and build your first predictive models.",
-      instructor: "Dr. Michael Chen",
-      instructorAvatar: "/placeholder.svg",
-      duration: "8 weeks",
-      students: 1923,
-      rating: 4.9,
-      reviews: 187,
-      level: "Beginner",
-      category: "ai",
-      image: "/placeholder.svg",
-      price: "Free",
-      skills: ["Python", "Machine Learning", "Data Analysis"],
-      modules: 12,
-      certificate: true,
-      featured: false
-    },
-    {
-      id: 3,
-      title: "Strategic Leadership in Digital Age",
-      description: "Develop leadership skills needed to guide teams through digital transformation.",
-      instructor: "Emily Rodriguez",
-      instructorAvatar: "/placeholder.svg",
-      duration: "6 weeks",
-      students: 1456,
-      rating: 4.7,
-      reviews: 156,
-      level: "Intermediate",
-      category: "leadership",
-      image: "/placeholder.svg",
-      price: "Free",
-      skills: ["Leadership", "Strategy", "Digital Transformation"],
-      modules: 10,
-      certificate: true,
-      featured: true
-    },
-    {
-      id: 4,
-      title: "Project Management Essentials",
-      description: "Master project management methodologies and tools for successful project delivery.",
-      instructor: "James Wilson",
-      instructorAvatar: "/placeholder.svg",
-      duration: "10 weeks",
-      students: 3124,
-      rating: 4.6,
-      reviews: 298,
-      level: "Beginner",
-      category: "business",
-      image: "/placeholder.svg",
-      price: "Free",
-      skills: ["Project Management", "Agile", "Scrum"],
-      modules: 14,
-      certificate: true,
-      featured: false
-    },
-    {
-      id: 5,
-      title: "Full-Stack Web Development",
-      description: "Build complete web applications from frontend to backend with modern technologies.",
-      instructor: "Alex Thompson",
-      instructorAvatar: "/placeholder.svg",
-      duration: "16 weeks",
-      students: 2657,
-      rating: 4.8,
-      reviews: 312,
-      level: "Intermediate",
-      category: "technology",
-      image: "/placeholder.svg",
-      price: "Free",
-      skills: ["HTML", "CSS", "JavaScript", "Node.js", "Database"],
-      modules: 20,
-      certificate: true,
-      featured: true
-    },
-    {
-      id: 6,
-      title: "Data Science with Python",
-      description: "Analyze data and create insights using Python libraries and statistical methods.",
-      instructor: "Dr. Lisa Chang",
-      instructorAvatar: "/placeholder.svg",
-      duration: "14 weeks",
-      students: 1834,
-      rating: 4.9,
-      reviews: 221,
-      level: "Intermediate",
-      category: "ai",
-      image: "/placeholder.svg",
-      price: "Free",
-      skills: ["Python", "Data Analysis", "Statistics", "Visualization"],
-      modules: 18,
-      certificate: true,
-      featured: false
+  const handleEnroll = async (courseId: string) => {
+    try {
+      await enrollInCourseMutation.mutateAsync(courseId);
+      toast({
+        title: "Enrolled Successfully!",
+        description: "You've been enrolled in the course. Start learning now!"
+      });
+    } catch (error) {
+      toast({
+        title: "Enrollment Failed", 
+        description: "Failed to enroll in course. Please try again.",
+        variant: "destructive"
+      });
     }
-  ];
+  };
 
-  const filteredCourses = courses.filter(course => {
+  const filteredCourses = courses?.filter(course => {
     const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          course.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          course.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesCategory = selectedCategory === "all" || course.category === selectedCategory;
-    const matchesLevel = selectedLevel === "all" || course.level.toLowerCase() === selectedLevel;
+    const matchesLevel = selectedLevel === "all" || course.difficulty_level.toLowerCase() === selectedLevel;
     
     return matchesSearch && matchesCategory && matchesLevel;
-  });
-
-  const featuredCourses = courses.filter(course => course.featured);
+  }) || [];
 
   return (
     <AppLayout>
@@ -221,7 +135,7 @@ const Courses = () => {
         </Card>
 
         {/* Featured Courses */}
-        {featuredCourses.length > 0 && (
+        {featuredCourses && featuredCourses.length > 0 && (
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <TrendingUp className="h-5 w-5 text-primary" />
@@ -232,13 +146,11 @@ const Courses = () => {
               {featuredCourses.map((course) => (
                 <Card key={course.id} className="hover:shadow-lg transition-shadow group">
                   <div className="relative">
-                    <img 
-                      src={course.image} 
-                      alt={course.title}
-                      className="w-full h-48 object-cover rounded-t-lg bg-muted"
-                    />
+                    <div className="w-full h-48 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-t-lg flex items-center justify-center">
+                      <BookOpen className="h-16 w-16 text-primary/50" />
+                    </div>
                     <Badge className="absolute top-3 left-3 bg-primary">Featured</Badge>
-                    {course.certificate && (
+                    {course.has_certificate && (
                       <Badge className="absolute top-3 right-3 bg-green-600">
                         <Award className="h-3 w-3 mr-1" />
                         Certificate
@@ -257,21 +169,19 @@ const Courses = () => {
                     </div>
 
                     <div className="flex items-center space-x-2">
-                      <img 
-                        src={course.instructorAvatar} 
-                        alt={course.instructor}
-                        className="w-6 h-6 rounded-full bg-muted"
-                      />
+                      <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center">
+                        <Users className="h-3 w-3" />
+                      </div>
                       <span className="text-sm text-muted-foreground">{course.instructor}</span>
                     </div>
 
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
                       <div className="flex items-center space-x-1">
                         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        <span>{course.rating}</span>
-                        <span>({course.reviews})</span>
+                        <span>4.8</span>
+                        <span>(124)</span>
                       </div>
-                      <Badge variant="secondary">{course.level}</Badge>
+                      <Badge variant="secondary">{course.difficulty_level}</Badge>
                     </div>
 
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
@@ -281,8 +191,8 @@ const Courses = () => {
                           <span>{course.duration}</span>
                         </div>
                         <div className="flex items-center space-x-1">
-                          <Users className="h-4 w-4" />
-                          <span>{course.students.toLocaleString()}</span>
+                          <BookOpen className="h-4 w-4" />
+                          <span>{course.modules} modules</span>
                         </div>
                       </div>
                     </div>
@@ -300,11 +210,9 @@ const Courses = () => {
                       )}
                     </div>
 
-                    <Button className="w-full" asChild>
-                      <Link to={`/course/${course.id}`}>
-                        <Play className="h-4 w-4 mr-2" />
-                        Start Learning
-                      </Link>
+                    <Button className="w-full" onClick={() => handleEnroll(course.id)}>
+                      <Play className="h-4 w-4 mr-2" />
+                      Enroll Now
                     </Button>
                   </CardContent>
                 </Card>
@@ -325,12 +233,10 @@ const Courses = () => {
             {filteredCourses.map((course) => (
               <Card key={course.id} className="hover:shadow-lg transition-shadow group">
                 <div className="relative">
-                  <img 
-                    src={course.image} 
-                    alt={course.title}
-                    className="w-full h-48 object-cover rounded-t-lg bg-muted"
-                  />
-                  {course.certificate && (
+                  <div className="w-full h-48 bg-gradient-to-br from-secondary/20 to-accent/20 rounded-t-lg flex items-center justify-center">
+                    <Brain className="h-16 w-16 text-secondary/50" />
+                  </div>
+                  {course.has_certificate && (
                     <Badge className="absolute top-3 right-3 bg-green-600">
                       <Award className="h-3 w-3 mr-1" />
                       Certificate
@@ -349,21 +255,19 @@ const Courses = () => {
                   </div>
 
                   <div className="flex items-center space-x-2">
-                    <img 
-                      src={course.instructorAvatar} 
-                      alt={course.instructor}
-                      className="w-6 h-6 rounded-full bg-muted"
-                    />
+                    <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center">
+                      <Users className="h-3 w-3" />
+                    </div>
                     <span className="text-sm text-muted-foreground">{course.instructor}</span>
                   </div>
 
                   <div className="flex items-center justify-between text-sm text-muted-foreground">
                     <div className="flex items-center space-x-1">
                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span>{course.rating}</span>
-                      <span>({course.reviews})</span>
+                      <span>4.7</span>
+                      <span>(89)</span>
                     </div>
-                    <Badge variant="secondary">{course.level}</Badge>
+                    <Badge variant="secondary">{course.difficulty_level}</Badge>
                   </div>
 
                   <div className="flex items-center justify-between text-sm text-muted-foreground">
@@ -392,11 +296,9 @@ const Courses = () => {
                     )}
                   </div>
 
-                  <Button className="w-full" asChild>
-                    <Link to={`/course/${course.id}`}>
-                      <Play className="h-4 w-4 mr-2" />
-                      Start Learning
-                    </Link>
+                  <Button className="w-full" onClick={() => handleEnroll(course.id)}>
+                    <Play className="h-4 w-4 mr-2" />
+                    Enroll Now
                   </Button>
                 </CardContent>
               </Card>
