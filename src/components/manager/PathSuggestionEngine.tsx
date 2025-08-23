@@ -107,7 +107,7 @@ export const PathSuggestionEngine = ({ teamId }: PathSuggestionEngineProps) => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="target-role">Target Role</Label>
               <Input
@@ -115,14 +115,15 @@ export const PathSuggestionEngine = ({ teamId }: PathSuggestionEngineProps) => {
                 placeholder="e.g., AI Engineer, Data Scientist"
                 value={targetRole}
                 onChange={(e) => setTargetRole(e.target.value)}
+                className="min-h-[44px]"
               />
-              <div className="flex flex-wrap gap-1 mt-2">
-                {popularRoles.slice(0, 5).map((role) => (
+              <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-1 mt-2">
+                {popularRoles.slice(0, 6).map((role) => (
                   <Button
                     key={role}
                     variant="ghost"
                     size="sm"
-                    className="h-6 text-xs"
+                    className="h-8 text-xs px-2 justify-start"
                     onClick={() => setTargetRole(role)}
                   >
                     {role}
@@ -134,7 +135,7 @@ export const PathSuggestionEngine = ({ teamId }: PathSuggestionEngineProps) => {
             <div className="space-y-2">
               <Label htmlFor="difficulty">Preferred Difficulty</Label>
               <Select value={difficultyLevel} onValueChange={(value: any) => setDifficultyLevel(value)}>
-                <SelectTrigger>
+                <SelectTrigger className="min-h-[44px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -226,7 +227,7 @@ export const PathSuggestionEngine = ({ teamId }: PathSuggestionEngineProps) => {
                   <CardDescription>{course.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div>
                       <h5 className="font-medium mb-2 flex items-center">
                         <Clock className="h-4 w-4 mr-1" />
@@ -243,11 +244,11 @@ export const PathSuggestionEngine = ({ teamId }: PathSuggestionEngineProps) => {
                     <div>
                       <h5 className="font-medium mb-2">Course Modules</h5>
                       <ul className="text-sm space-y-1">
-                        {course.modules.slice(0, 4).map((module, idx) => (
+                        {course.modules.slice(0, 3).map((module, idx) => (
                           <li key={idx} className="text-muted-foreground">• {module}</li>
                         ))}
-                        {course.modules.length > 4 && (
-                          <li className="text-xs text-muted-foreground">... and {course.modules.length - 4} more</li>
+                        {course.modules.length > 3 && (
+                          <li className="text-xs text-muted-foreground">... and {course.modules.length - 3} more</li>
                         )}
                       </ul>
                     </div>
@@ -271,11 +272,11 @@ export const PathSuggestionEngine = ({ teamId }: PathSuggestionEngineProps) => {
                     </AlertDescription>
                   </Alert>
 
-                  <div className="flex gap-2">
-                    <Button className="flex-1">
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button className="flex-1 min-h-[44px]">
                       Enroll Team
                     </Button>
-                    <Button variant="outline">
+                    <Button variant="outline" className="flex-1 sm:flex-none min-h-[44px]">
                       View Details
                     </Button>
                   </div>

@@ -103,32 +103,33 @@ export const TrendInsights = () => {
       {/* Header */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Zap className="h-5 w-5 text-primary" />
-              <CardTitle>AI Skills Trend Insights</CardTitle>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-primary" />
+                <CardTitle>AI Skills Trend Insights</CardTitle>
+              </div>
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <Select value={timePeriod} onValueChange={(value: any) => setTimePeriod(value)}>
+                  <SelectTrigger className="w-full sm:w-32 min-h-[44px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                    <SelectItem value="quarterly">Quarterly</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => refreshInsights.mutate()}
+                  disabled={refreshInsights.isPending}
+                  className="min-h-[44px] px-3"
+                >
+                  <RefreshCw className={`h-4 w-4 ${refreshInsights.isPending ? 'animate-spin' : ''}`} />
+                </Button>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Select value={timePeriod} onValueChange={(value: any) => setTimePeriod(value)}>
-                <SelectTrigger className="w-32">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
-                  <SelectItem value="quarterly">Quarterly</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => refreshInsights.mutate()}
-                disabled={refreshInsights.isPending}
-              >
-                <RefreshCw className={`h-4 w-4 ${refreshInsights.isPending ? 'animate-spin' : ''}`} />
-              </Button>
-            </div>
-          </div>
           <CardDescription>
             Real-time market insights and AI skill demand analysis
             {trendData?.cached && (
@@ -148,31 +149,33 @@ export const TrendInsights = () => {
           </CardContent>
         </Card>
       ) : trendData ? (
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           {/* Trending Skills */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="xl:col-span-2 space-y-4">
             <h3 className="text-lg font-semibold">Top Trending Skills This {timePeriod.slice(0, -2)}</h3>
             <div className="grid gap-3">
               {trendData.trendingSkills.slice(0, 6).map((skill, index) => (
                 <Card key={index}>
                   <CardContent className="p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
+                    <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+                      <div className="flex-1 w-full sm:w-auto">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-1">
                           <h4 className="font-medium">{skill.skillName}</h4>
-                          {getTrendIcon(skill.growthRate)}
-                          <Badge variant="secondary" className="text-xs">
-                            {skill.category}
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            {getTrendIcon(skill.growthRate)}
+                            <Badge variant="secondary" className="text-xs">
+                              {skill.category}
+                            </Badge>
+                          </div>
                         </div>
                         <p className="text-sm text-muted-foreground mb-2">{skill.description}</p>
                         <div className="flex flex-wrap gap-1">
-                          {skill.relatedTechnologies.slice(0, 3).map((tech, idx) => (
+                          {skill.relatedTechnologies.slice(0, 2).map((tech, idx) => (
                             <Badge key={idx} variant="outline" className="text-xs">{tech}</Badge>
                           ))}
                         </div>
                       </div>
-                      <div className="text-right ml-4">
+                      <div className="text-left sm:text-right">
                         <div className="text-lg font-bold">{skill.demandScore}</div>
                         <div className="text-xs text-muted-foreground">demand score</div>
                         <div className={`text-sm font-medium ${getMarketValueColor(skill.marketValue)}`}>
@@ -259,7 +262,7 @@ export const TrendInsights = () => {
 
       {/* Predictions */}
       {trendData?.predictions && (
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base">Next Quarter</CardTitle>

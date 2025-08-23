@@ -154,7 +154,7 @@ export const OneClickUpskillingPlan = ({ teamId }: OneClickUpskillingPlanProps) 
         <CardContent className="space-y-6">
           {/* Team Overview */}
           {teamData && (
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <Card className="p-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-primary">{members?.length || 0}</div>
@@ -248,7 +248,7 @@ export const OneClickUpskillingPlan = ({ teamId }: OneClickUpskillingPlanProps) 
                           <Badge variant="outline">{phase.duration}</Badge>
                         </div>
                         
-                        <div className="grid md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                           <div>
                             <p className="text-sm font-medium text-blue-600 mb-2">Skills to Develop:</p>
                             <div className="flex flex-wrap gap-1">
@@ -272,30 +272,30 @@ export const OneClickUpskillingPlan = ({ teamId }: OneClickUpskillingPlanProps) 
                 </div>
               </div>
 
-              {/* Skill Priorities */}
-              <div className="space-y-4">
-                <h4 className="font-medium">Team Skill Priorities</h4>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {result.aggregatedPlan.skillPriorities.map((priority, index) => (
-                    <Card key={index} className="p-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <h5 className="font-medium text-sm">{priority.skill}</h5>
-                          <Badge variant={
-                            priority.urgency === 'high' ? 'destructive' :
-                            priority.urgency === 'medium' ? 'default' : 'secondary'
-                          } className="text-xs">
-                            {priority.urgency}
-                          </Badge>
+                {/* Skill Priorities */}
+                <div className="space-y-4">
+                  <h4 className="font-medium">Team Skill Priorities</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {result.aggregatedPlan.skillPriorities.map((priority, index) => (
+                      <Card key={index} className="p-4">
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <h5 className="font-medium text-sm">{priority.skill}</h5>
+                            <Badge variant={
+                              priority.urgency === 'high' ? 'destructive' :
+                              priority.urgency === 'medium' ? 'default' : 'secondary'
+                            } className="text-xs">
+                              {priority.urgency}
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            {priority.employeeCount} team members need this skill
+                          </p>
                         </div>
-                        <p className="text-xs text-muted-foreground">
-                          {priority.employeeCount} team members need this skill
-                        </p>
-                      </div>
-                    </Card>
-                  ))}
+                      </Card>
+                    ))}
+                  </div>
                 </div>
-              </div>
             </CardContent>
           </Card>
 
@@ -338,7 +338,7 @@ export const OneClickUpskillingPlan = ({ teamId }: OneClickUpskillingPlanProps) 
                               <div key={idx} className="flex items-center">
                                 <Badge variant="outline" className="text-xs">{step}</Badge>
                                 {idx < plan.recommendedPath.length - 1 && (
-                                  <ArrowRight className="h-3 w-3 mx-1 text-muted-foreground" />
+                                  <ArrowRight className="h-3 w-3 mx-1 text-muted-foreground shrink-0" />
                                 )}
                               </div>
                             ))}
@@ -353,7 +353,7 @@ export const OneClickUpskillingPlan = ({ teamId }: OneClickUpskillingPlanProps) 
           </Card>
 
           {/* Side-by-Side Comparison */}
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Current Team Skills</CardTitle>

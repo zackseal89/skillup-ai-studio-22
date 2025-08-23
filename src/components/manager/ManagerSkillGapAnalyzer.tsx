@@ -136,9 +136,9 @@ export const ManagerSkillGapAnalyzer = ({ teamId }: ManagerSkillGapAnalyzerProps
         <CardContent className="space-y-6">
           {/* Job Roles Section */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <h4 className="font-medium">Target Job Roles</h4>
-              <Button variant="outline" size="sm" onClick={addJobRole}>
+              <Button variant="outline" size="sm" onClick={addJobRole} className="w-full sm:w-auto">
                 <Users className="h-4 w-4 mr-2" />
                 Add Role
               </Button>
@@ -173,9 +173,9 @@ export const ManagerSkillGapAnalyzer = ({ teamId }: ManagerSkillGapAnalyzerProps
 
           {/* Employee Profiles Section */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <h4 className="font-medium">Employee Profiles</h4>
-              <Button variant="outline" size="sm" onClick={addEmployeeProfile}>
+              <Button variant="outline" size="sm" onClick={addEmployeeProfile} className="w-full sm:w-auto">
                 <Upload className="h-4 w-4 mr-2" />
                 Add Employee
               </Button>
@@ -285,7 +285,7 @@ export const ManagerSkillGapAnalyzer = ({ teamId }: ManagerSkillGapAnalyzerProps
                         </div>
                       </div>
                       
-                      <div className="grid md:grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 text-sm">
                         <div>
                           <p className="font-medium text-red-600">Missing Skills:</p>
                           <div className="flex flex-wrap gap-1 mt-1">
@@ -330,7 +330,7 @@ export const ManagerSkillGapAnalyzer = ({ teamId }: ManagerSkillGapAnalyzerProps
                         <span className="text-sm font-medium">{roleInsight.teamReadiness}% ready</span>
                       </div>
                       
-                      <div className="grid md:grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 text-sm">
                         <div>
                           <p className="font-medium text-red-600">Major Gaps:</p>
                           <ul className="list-disc list-inside mt-1">

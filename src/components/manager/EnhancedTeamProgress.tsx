@@ -137,16 +137,16 @@ export const EnhancedTeamProgress = ({ teamId }: EnhancedTeamProgressProps) => {
       {/* Difficulty Level Progress */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5 text-primary" />
-              <CardTitle>Team Progress by Difficulty Level</CardTitle>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-primary" />
+                <CardTitle>Team Progress by Difficulty Level</CardTitle>
+              </div>
+              <Button variant="outline" size="sm" className="w-full sm:w-auto min-h-[44px]">
+                <Download className="h-4 w-4 mr-2" />
+                Export Report
+              </Button>
             </div>
-            <Button variant="outline" size="sm">
-              <Download className="h-4 w-4 mr-2" />
-              Export Report
-            </Button>
-          </div>
           <CardDescription>
             Course completion rates across beginner, intermediate, and advanced levels
           </CardDescription>
@@ -172,7 +172,7 @@ export const EnhancedTeamProgress = ({ teamId }: EnhancedTeamProgressProps) => {
             </div>
 
             {/* Progress Details */}
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {difficultyProgress.map((level, index) => (
                 <Card key={index} className="p-4">
                   <div className="space-y-2">
@@ -195,7 +195,7 @@ export const EnhancedTeamProgress = ({ teamId }: EnhancedTeamProgressProps) => {
       </Card>
 
       {/* Skill Category Analysis */}
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">

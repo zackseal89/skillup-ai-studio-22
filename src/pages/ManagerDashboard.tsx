@@ -130,26 +130,31 @@ const ManagerDashboard = () => {
         {/* Main Content Tabs - only show if company exists */}
         {company && (
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="overview" className="flex items-center">
-                <Users className="h-4 w-4 mr-2" />
-                Team Overview
+            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 h-auto">
+              <TabsTrigger value="overview" className="flex flex-col sm:flex-row items-center gap-1 min-h-[60px] sm:min-h-[44px] text-xs sm:text-sm p-2">
+                <Users className="h-4 w-4" />
+                <span className="hidden sm:inline">Team Overview</span>
+                <span className="sm:hidden">Overview</span>
               </TabsTrigger>
-              <TabsTrigger value="analytics" className="flex items-center">
-                <TrendingUp className="h-4 w-4 mr-2" />
-                Skill Analytics
+              <TabsTrigger value="analytics" className="flex flex-col sm:flex-row items-center gap-1 min-h-[60px] sm:min-h-[44px] text-xs sm:text-sm p-2">
+                <TrendingUp className="h-4 w-4" />
+                <span className="hidden sm:inline">Skill Analytics</span>
+                <span className="sm:hidden">Analytics</span>
               </TabsTrigger>
-              <TabsTrigger value="recommendations" className="flex items-center">
-                <Target className="h-4 w-4 mr-2" />
-                AI Recommendations
+              <TabsTrigger value="recommendations" className="flex flex-col sm:flex-row items-center gap-1 min-h-[60px] sm:min-h-[44px] text-xs sm:text-sm p-2">
+                <Target className="h-4 w-4" />
+                <span className="hidden sm:inline">AI Recommendations</span>
+                <span className="sm:hidden">AI Recs</span>
               </TabsTrigger>
-              <TabsTrigger value="insights" className="flex items-center">
-                <AlertCircle className="h-4 w-4 mr-2" />
-                Trend Insights
+              <TabsTrigger value="insights" className="flex flex-col sm:flex-row items-center gap-1 min-h-[60px] sm:min-h-[44px] text-xs sm:text-sm p-2">
+                <AlertCircle className="h-4 w-4" />
+                <span className="hidden sm:inline">Trend Insights</span>
+                <span className="sm:hidden">Trends</span>
               </TabsTrigger>
-              <TabsTrigger value="users" className="flex items-center">
-                <UserCog className="h-4 w-4 mr-2" />
-                User Management
+              <TabsTrigger value="users" className="flex flex-col sm:flex-row items-center gap-1 min-h-[60px] sm:min-h-[44px] text-xs sm:text-sm p-2">
+                <UserCog className="h-4 w-4" />
+                <span className="hidden sm:inline">User Management</span>
+                <span className="sm:hidden">Users</span>
               </TabsTrigger>
             </TabsList>
 
