@@ -70,6 +70,12 @@ export const SkillGapAnalyzer = () => {
 
     setIsAnalyzing(true);
     try {
+      // First get the user info for webhook
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
       let roadmapContent = '';
       
       if (analysisType === 'roadmap-specific' && selectedRoadmapId) {
@@ -77,28 +83,54 @@ export const SkillGapAnalyzer = () => {
         roadmapContent = selectedRoadmap?.roadmap_content || '';
       }
 
-      const { data, error } = await supabase.functions.invoke('skill-gap-analysis', {
-        body: {
-          cvContent: cvContent.trim(),
-          targetRole: targetRole.trim() || undefined,
-          roadmapContent,
-          analysisType
-        }
+      // Prepare webhook payload with thread and unique ID mapping
+      const webhookPayload = {
+        thread_id: user.id, // Map user ID as thread ID for continuous conversation
+        unique_id: `skill-gap-${user.id}-${Date.now()}`, // Prevent duplicate processing
+        analysis_type: analysisType,
+        target_role: targetRole.trim() || "General Analysis",
+        cv_content: cvContent.trim(),
+        roadmap_content: roadmapContent,
+        user_info: {
+          user_id: user.id,
+          email: user.email
+        },
+        timestamp: new Date().toISOString()
+      };
+
+      // Send to webhook
+      const webhookResponse = await fetch('https://api-d7b62b.stack.tryrelevance.com/latest/agents/hooks/custom-trigger/364b341ac204-4cd3-9991-5ba8535b1d7a/d27c17e8-faf7-4d92-9eeb-73a5c4c95217', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(webhookPayload)
       });
 
-      if (error) {
-        console.error('Skill gap analysis error:', error);
-        throw new Error(error.message || 'Failed to analyze skills');
+      if (!webhookResponse.ok) {
+        throw new Error(`Webhook failed: ${webhookResponse.status}`);
       }
 
-      if (!data.success) {
-        throw new Error(data.error || 'Analysis failed');
-      }
+      const webhookResult = await webhookResponse.json();
+      
+      // Process webhook response and format as SkillGapResult
+      const formattedResult: SkillGapResult = {
+        analysis: webhookResult.analysis || webhookResult.message || "Analysis completed by agent",
+        skillGaps: {
+          count: webhookResult.skill_gaps?.count || 0,
+          skills: webhookResult.skill_gaps?.skills || [],
+          summary: webhookResult.skill_gaps?.summary || "No specific gaps identified"
+        },
+        analysisType: analysisType,
+        targetRole: targetRole.trim() || "General Analysis",
+        tokensUsed: webhookResult.tokens_used || 0,
+        success: true
+      };
 
-      setResult(data);
+      setResult(formattedResult);
       toast({
         title: "Analysis Complete!",
-        description: `Found ${data.skillGaps.count} skill gaps to address.`,
+        description: `Agent analysis completed. ${formattedResult.skillGaps.count} skill gaps identified.`,
       });
     } catch (error) {
       console.error('Analysis error:', error);
